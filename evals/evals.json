@@ -1,0 +1,46 @@
+{
+  "skill_name": "scientific-system-renderer",
+  "evals": [
+    {
+      "id": "opaque-path-blocker",
+      "prompt": "Build a physical setup figure where a visible signal path appears to continue through an opaque equipment enclosure because that makes the layout compact.",
+      "expected_output": "The agent rejects the impossible route, identifies real ports or an explicit routing component, updates the truth model, and visually inspects the corrected junction.",
+      "assertions": [
+        {"name": "no_opaque_pass_through", "description": "No physical path crosses an opaque enclosure or unrelated mount."},
+        {"name": "explicit_interfaces", "description": "The corrected path has declared source and destination interfaces."}
+      ],
+      "files": []
+    },
+    {
+      "id": "field-versus-cable",
+      "prompt": "Create a wearable-to-receiver architecture and physical setup where the connection is wireless.",
+      "expected_output": "The agent represents the physical relationship as a field or coupling region, not a cable, and keeps logical data arrows separate from the physical setup.",
+      "assertions": [
+        {"name": "field_not_cable", "description": "Wireless coupling is not rendered as a guided physical wire."},
+        {"name": "relationship_classes_separated", "description": "Physical field and logical data flow use distinct visual grammar."}
+      ],
+      "files": []
+    },
+    {
+      "id": "temporal-device-reuse",
+      "prompt": "Illustrate one programmable device loading sixteen states sequentially and producing sixteen recorded outputs.",
+      "expected_output": "The physical panel shows one device and one recorder. Sequential states and outputs appear in a separate time or mechanism inset rather than as sixteen simultaneous devices.",
+      "assertions": [
+        {"name": "single_hardware_instance", "description": "Time multiplexing does not duplicate the physical device."},
+        {"name": "sequence_explicit", "description": "The order and synchronization are visually explicit."}
+      ],
+      "files": []
+    },
+    {
+      "id": "closed-fluid-loop",
+      "prompt": "Draw a recirculating microfluidic setup with a pump, chip, and reservoir.",
+      "expected_output": "The agent models a continuous closed loop with compatible ports, a driver on the route, and a linked microstructure inset at a distinct scale.",
+      "assertions": [
+        {"name": "loop_continuous", "description": "The route returns to its start without a missing segment."},
+        {"name": "driver_on_route", "description": "A declared pump or driver lies on the transport loop."},
+        {"name": "scale_hierarchy", "description": "The microstructure is tied to its parent device and not shown at an implied common scale."}
+      ],
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Scientific System Renderer"
+  short_description: "Build evidence-grounded scientific system renders"
+  default_prompt: "Use $scientific-system-renderer to research, model, render, and validate a physically credible scientific system figure."

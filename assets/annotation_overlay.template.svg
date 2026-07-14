@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="3000" height="1688" viewBox="0 0 3000 1688">
+  <title>Editable scientific system annotation overlay</title>
+  <image id="render-base" href="system_no_text.png" x="0" y="0" width="3000" height="1688"/>
+  <g id="device-labels" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="700" fill="#111827">
+    <text id="source-label" x="560" y="430" text-anchor="middle">Source</text>
+    <text id="sink-label" x="2440" y="430" text-anchor="middle">Sink</text>
+  </g>
+  <g id="connection-labels" font-family="Arial, Helvetica, sans-serif" font-size="34" fill="#1f2937">
+    <text id="path-label" x="1500" y="770" text-anchor="middle">Physical connection</text>
+  </g>
+</svg>

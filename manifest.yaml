@@ -1,0 +1,68 @@
+name: scientific-system-renderer
+version: 1.1.0
+description: >
+  Router manifest for evidence-grounded scientific system rendering. Core
+  physical and QA rules load for every task; route and domain references load
+  only when needed.
+
+always_load:
+  - static/core/truth-contract.md
+  - static/core/default-stance.md
+
+routes:
+  architecture_overview:
+    detect: Functional architecture, module relationships, data flow, control flow, or system overview where literal placement is secondary.
+    preferred_output: Editable 2D SVG; use 3D only when spatial arrangement carries meaning.
+    references:
+      - references/workflow.md
+      - references/visual-and-delivery.md
+  physical_setup:
+    detect: Real equipment connection, experimental setup, installation, bench, rig, or assembly with physical interfaces and supports.
+    preferred_output: Script-built Blender scene plus transparent no-text PNG and editable SVG labels.
+    references:
+      - references/workflow.md
+      - references/physical-plausibility.md
+      - references/blender-patterns.md
+      - references/visual-and-delivery.md
+  component_sheet:
+    detect: Device or component view emphasizing silhouette, active area, ports, dimensions, assembly, or mounting interface.
+    preferred_output: Orthographic or controlled-perspective Blender render with editable callouts.
+    references:
+      - references/evidence-and-provenance.md
+      - references/blender-patterns.md
+      - references/visual-and-delivery.md
+  mechanism_inset:
+    detect: Internal mechanism, state sequence, multiplexing, process stages, conversion, or electronic post-processing.
+    preferred_output: Editable SVG mechanism panel linked to, but visually separate from, the physical setup.
+    references:
+      - references/physical-plausibility.md
+      - references/visual-and-delivery.md
+  hybrid_figure:
+    detect: Publication figure combining a physically credible 3D base with editable annotations, equations, architecture, or mechanism panels.
+    preferred_output: High-resolution no-text render plus SVG overlay and raster preview.
+    references:
+      - references/workflow.md
+      - references/blender-patterns.md
+      - references/visual-and-delivery.md
+  audit_repair:
+    detect: Existing render, Blender file, diagram, or screenshot must be checked and corrected for physical or visual errors.
+    preferred_output: Findings, corrected reproducible source, revised render, and before/after QA record.
+    references:
+      - references/workflow.md
+      - references/physical-plausibility.md
+      - references/blender-patterns.md
+
+references:
+  on_demand:
+    - condition: source licensing, provenance, component fidelity, or claim tracing matters
+      path: references/evidence-and-provenance.md
+    - condition: optical, electrical, fluidic, thermal, RF, biomedical, mechanical, robotic, or logical connectivity must be checked
+      path: references/physical-plausibility.md
+    - condition: Blender geometry, materials, lighting, camera, supports, or rendering is being implemented
+      path: references/blender-patterns.md
+    - condition: labels, composition, transparency, manuscript width, slide width, or export formats are being decided
+      path: references/visual-and-delivery.md
+    - condition: a complex task needs detailed stage gates or iterative QA practice
+      path: references/workflow.md
+    - condition: an optical bench is being built or repeated optical path errors are being repaired
+      path: references/optical-bench-failure-patterns.md

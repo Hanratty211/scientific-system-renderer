@@ -1,0 +1,148 @@
+{
+  "schema_version": "1.0",
+  "purpose": "Original synthetic fixtures for cross-domain validation of the scene truth model. No external paper text, artwork, figure metadata, or bibliographic record is included.",
+  "minimum_cases": 10,
+  "minimum_domain_families": 7,
+  "cases": [
+    {
+      "id": "optical-transmission-stack",
+      "title": "Transmissive optical modulation stack",
+      "discipline_group": "optics-photonics",
+      "domain_family": "optics",
+      "archetype": "optical_stack",
+      "scenario": "A source, one transmissive modulation layer, and a detector form a directed optical path.",
+      "required_features": ["physical path", "active interfaces", "architecture inset"],
+      "negative_test": {"kind": "opaque_pass_through", "expected_codes": ["N019"]}
+    },
+    {
+      "id": "integrated-chip-hierarchy",
+      "title": "Multiscale integrated compute assembly",
+      "discipline_group": "electronics-computing",
+      "domain_family": "integrated-computing",
+      "archetype": "chip_hierarchy",
+      "scenario": "A device contains a compute core and a representative microstructure shown as linked detail views.",
+      "required_features": ["assembly hierarchy", "scale transitions", "linked inset"],
+      "negative_test": {"kind": "orphan_microstructure", "expected_codes": ["H003"]}
+    },
+    {
+      "id": "logical-compute-pipeline",
+      "title": "Logical compute and memory pipeline",
+      "discipline_group": "electronics-computing",
+      "domain_family": "digital-computing",
+      "archetype": "logical_compute",
+      "scenario": "Functional compute stages exchange logical data without implying literal physical cables.",
+      "required_features": ["logical edges", "module boundaries", "architecture view"],
+      "negative_test": {"kind": "logical_as_physical", "expected_codes": ["R001"]}
+    },
+    {
+      "id": "wearable-contact-stack",
+      "title": "Conformal wearable sensing stack",
+      "discipline_group": "biomedical-bioelectronics",
+      "domain_family": "wearable-biomedical",
+      "archetype": "wearable_contact",
+      "scenario": "A layered wearable sensor contacts anatomy through an explicitly classified interface.",
+      "required_features": ["exploded stack", "anatomical contact", "active layer"],
+      "negative_test": {"kind": "wrong_contact_class", "expected_codes": ["B001"]}
+    },
+    {
+      "id": "wireless-wearable-link",
+      "title": "Wearable sensor with wireless telemetry",
+      "discipline_group": "biomedical-bioelectronics",
+      "domain_family": "wearable-electronics",
+      "archetype": "wireless_wearable",
+      "scenario": "A wearable sensing module transfers data to a receiver through a field relationship.",
+      "required_features": ["wearable assembly", "field link", "receiver"],
+      "negative_test": {"kind": "field_as_cable", "expected_codes": ["R003"]}
+    },
+    {
+      "id": "wireless-implant-link",
+      "title": "Wireless implant and external transmitter",
+      "discipline_group": "biomedical-bioelectronics",
+      "domain_family": "implantable-bioelectronics",
+      "archetype": "wireless_implant",
+      "scenario": "An external transmitter couples to an implant across tissue and the implant contacts a target interface.",
+      "required_features": ["field coupling", "tissue boundary", "anatomical interface"],
+      "negative_test": {"kind": "field_as_cable", "expected_codes": ["R003"]}
+    },
+    {
+      "id": "aerial-mobile-tool",
+      "title": "Aerial robot with a process tool",
+      "discipline_group": "robotics-automation",
+      "domain_family": "aerial-robotics",
+      "archetype": "mobile_robot",
+      "scenario": "A mobile aerial platform carries a tool and operates within a visible work envelope.",
+      "required_features": ["tool attachment", "flight envelope", "process path"],
+      "negative_test": {"kind": "missing_motion_envelope", "expected_codes": ["O006"]}
+    },
+    {
+      "id": "ground-mobile-lab",
+      "title": "Ground robot serving laboratory stations",
+      "discipline_group": "robotics-automation",
+      "domain_family": "laboratory-robotics",
+      "archetype": "mobile_robot",
+      "scenario": "A mobile manipulator travels between stations and reaches equipment within a declared envelope.",
+      "required_features": ["mobile base", "tool attachment", "reach envelope"],
+      "negative_test": {"kind": "missing_motion_envelope", "expected_codes": ["O006"]}
+    },
+    {
+      "id": "automated-lab-sequence",
+      "title": "Automated laboratory process sequence",
+      "discipline_group": "robotics-automation",
+      "domain_family": "autonomous-laboratory",
+      "archetype": "lab_sequence",
+      "scenario": "A scheduler coordinates dosing, transfer, processing, and measurement as ordered hardware states.",
+      "required_features": ["state sequence", "hardware reuse", "motion envelope"],
+      "negative_test": {"kind": "invalid_sequence_state", "expected_codes": ["S007"]}
+    },
+    {
+      "id": "open-thermal-fluid-route",
+      "title": "Driven open thermal-fluid process",
+      "discipline_group": "thermal-chemical-systems",
+      "domain_family": "thermal-fluid-systems",
+      "archetype": "thermal_fluid_cycle",
+      "scenario": "A driven open route passes through capture, heating, condensation, and outlet stages.",
+      "required_features": ["open boundaries", "flow driver", "temporal states"],
+      "negative_test": {"kind": "missing_flow_driver", "expected_codes": ["F008"]}
+    },
+    {
+      "id": "deformable-sensor-skin",
+      "title": "Deformable structure with a sensor skin",
+      "discipline_group": "soft-systems",
+      "domain_family": "soft-robotics",
+      "archetype": "deformable_sensor",
+      "scenario": "A conformal sensor layer follows a deformable body and reports its state to a processor.",
+      "required_features": ["parent attachment", "deformation states", "motion envelope"],
+      "negative_test": {"kind": "missing_deformation_state", "expected_codes": ["C021"]}
+    },
+    {
+      "id": "reconfigurable-mechanical-lattice",
+      "title": "Reconfigurable mechanical lattice",
+      "discipline_group": "mechanics-materials",
+      "domain_family": "mechanical-metamaterials",
+      "archetype": "metamaterial_motion",
+      "scenario": "An actuator excites a lattice with multiple declared mechanical states and a deformation envelope.",
+      "required_features": ["mechanical contact", "operating states", "deformation envelope"],
+      "negative_test": {"kind": "missing_motion_envelope", "expected_codes": ["O006"]}
+    },
+    {
+      "id": "closed-microfluidic-loop",
+      "title": "Closed microfluidic perfusion loop",
+      "discipline_group": "microfluidics-bioengineering",
+      "domain_family": "microfluidics",
+      "archetype": "microfluidic_loop",
+      "scenario": "A pump, chip, and reservoir form a continuous driven loop with a linked channel detail.",
+      "required_features": ["closed loop", "flow driver", "microstructure inset"],
+      "negative_test": {"kind": "broken_loop", "expected_codes": ["L007"]}
+    },
+    {
+      "id": "closed-loop-implant-controller",
+      "title": "Closed-loop wearable and implant controller",
+      "discipline_group": "biomedical-bioelectronics",
+      "domain_family": "closed-loop-bioelectronics",
+      "archetype": "closed_loop_implant",
+      "scenario": "A wearable controller and implant exchange wireless commands and feedback while contacting anatomy.",
+      "required_features": ["bidirectional field link", "control loop", "anatomical contacts"],
+      "negative_test": {"kind": "missing_body_contact", "expected_codes": ["B001"]}
+    }
+  ]
+}

@@ -1,0 +1,173 @@
+{
+  "schema_version": "1.1",
+  "title": "Scientific system render",
+  "domain": "general",
+  "truth_level": "topology-faithful",
+  "sources": [
+    {
+      "id": "S1",
+      "type": "project-brief",
+      "title": "Starter schematic requirements",
+      "locator": "WORKLOG.md",
+      "authority": "project",
+      "accessed": null
+    }
+  ],
+  "views": [
+    {
+      "id": "physical-setup",
+      "type": "physical-setup",
+      "representation": "physical",
+      "scale_level": "system",
+      "state_display": "single",
+      "purpose": "Show the buildable source-to-sink connection",
+      "camera": "orthographic-isometric",
+      "shows_components": [
+        "source",
+        "sink"
+      ]
+    }
+  ],
+  "deliverables": [
+    "final/system.blend",
+    "final/system_no_text.png",
+    "final/system_annotated.svg",
+    "final/system_annotated.png"
+  ],
+  "components": [
+    {
+      "id": "source",
+      "name": "Source",
+      "category": "source",
+      "physical_role": "Generate the transported medium or signal",
+      "scale_level": "device",
+      "mobility": "fixed",
+      "opacity": "opaque",
+      "capabilities": [
+        "source"
+      ],
+      "ports": [
+        {
+          "id": "out",
+          "direction": "out",
+          "media": [
+            "generic"
+          ],
+          "face": "front",
+          "allows_multiple": false
+        }
+      ],
+      "active_faces": [
+        {
+          "id": "front",
+          "behavior": "emit",
+          "opacity": "mixed"
+        }
+      ],
+      "mount": {
+        "required": true,
+        "type": "base-and-post",
+        "attachment": "bottom"
+      },
+      "evidence": [
+        "S1"
+      ],
+      "confidence": "schematic"
+    },
+    {
+      "id": "sink",
+      "name": "Sink or detector",
+      "category": "sink",
+      "physical_role": "Receive or measure the transported medium or signal",
+      "scale_level": "device",
+      "mobility": "fixed",
+      "opacity": "opaque",
+      "capabilities": [
+        "sink",
+        "sense"
+      ],
+      "ports": [
+        {
+          "id": "in",
+          "direction": "in",
+          "media": [
+            "generic"
+          ],
+          "face": "front",
+          "allows_multiple": false
+        }
+      ],
+      "active_faces": [
+        {
+          "id": "front",
+          "behavior": "receive",
+          "opacity": "mixed"
+        }
+      ],
+      "mount": {
+        "required": true,
+        "type": "base-and-post",
+        "attachment": "bottom"
+      },
+      "evidence": [
+        "S1"
+      ],
+      "confidence": "schematic"
+    }
+  ],
+  "connections": [
+    {
+      "id": "source-to-sink",
+      "representation": "physical",
+      "medium": "generic",
+      "source": {
+        "component": "source",
+        "port": "out"
+      },
+      "target": {
+        "component": "sink",
+        "port": "in"
+      },
+      "path": {
+        "style": "straight",
+        "bends_at": [],
+        "passes_through": []
+      },
+      "profile": [
+        {
+          "at": "source:out",
+          "width": 1.0,
+          "cause_component": null
+        },
+        {
+          "at": "sink:in",
+          "width": 1.0,
+          "cause_component": null
+        }
+      ],
+      "timing": "continuous",
+      "evidence": [
+        "S1"
+      ]
+    }
+  ],
+  "sequences": [],
+  "routes": [],
+  "loops": [],
+  "motions": [],
+  "assumptions": [
+    {
+      "id": "A1",
+      "statement": "Starter geometry is schematic until replaced by project evidence",
+      "impact": "medium",
+      "status": "open"
+    }
+  ],
+  "open_questions": [],
+  "acceptance_criteria": [
+    "Every path starts and ends at a declared port",
+    "No path crosses opaque or unrelated geometry",
+    "Every elevated component is attached to a support",
+    "The final no-text render remains legible on a white background"
+  ]
+}
