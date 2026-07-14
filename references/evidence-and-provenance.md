@@ -74,3 +74,23 @@ Classify important details as:
 - `unknown`: missing evidence and potentially blocking.
 
 Put unresolved assumptions in `scene_manifest.json` and the caption/QA notes. Never let an unverified detail silently appear photorealistic and authoritative.
+
+## Mandatory uncertainty escalation
+
+When a factual property is unsupported, do not select a plausible value on the
+user's behalf. Add a blocking `open_questions` entry and ask the user with the
+smallest useful visual context. If the user cannot answer, search in this
+priority order: exact manufacturer documentation, primary research describing
+the same setup, applicable standards or patents, then multiple independent
+high-quality secondary sources. Record supporting and conflicting sources.
+
+Only four resolutions permit the affected detail to enter a deliverable:
+
+- `user-confirmed`: the user directly identifies or approves the fact;
+- `authoritative-source`: a cited primary/manual/standard source resolves it;
+- `intentionally-omitted`: the uncertain detail is removed from the view;
+- `schematic-placeholder`: it is visibly non-literal and labeled unresolved.
+
+Visual similarity, convention, prior generated artwork, or agent preference are
+not valid resolutions. If sources conflict, return to the user with the
+conflict instead of choosing one silently.

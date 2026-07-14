@@ -1,5 +1,5 @@
 name: scientific-system-renderer
-version: 1.1.0
+version: 1.2.0
 description: >
   Router manifest for evidence-grounded scientific system rendering. Core
   physical and QA rules load for every task; route and domain references load

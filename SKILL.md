@@ -10,7 +10,7 @@ description: >-
   orientations, collisions, floating supports, misleading scale, temporal
   states shown as simultaneous hardware, or ambiguous labels.
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
   author: "Community contribution"
 ---
 
@@ -54,7 +54,30 @@ transparency, exact scale, or internal behavior from visual resemblance alone.
 Read [evidence-and-provenance.md](references/evidence-and-provenance.md) when
 copyright, product fidelity, citations, or source tracing matters.
 
-### 4. Initialize and validate the truth model
+### 4. Resolve uncertainty before modeling
+
+Treat every uncertain factual detail as blocked, not as permission to
+improvise. This includes component identity, scale, port meaning, direction,
+hidden topology, material behavior, support, route, termination, and operating
+state. Use this order without skipping steps:
+
+1. Record the uncertainty in `open_questions` and stop modeling the affected
+   detail.
+2. Ask the user one concise, concrete question, preferably with a crop or two
+   clearly distinguished alternatives.
+3. If the user cannot confirm it, search primary literature, manufacturer
+   manuals/datasheets, standards, patents, or other authoritative sources and
+   record the citation in the source ledger.
+4. If authoritative evidence still does not resolve it, omit the detail or use
+   a visibly schematic placeholder labeled `unresolved`. Never silently choose
+   the most plausible-looking option.
+
+User confirmation outranks visual guesswork. A similar product photograph,
+common practice, prior generated image, or aesthetic preference is not enough
+to resolve a factual unknown. Pure styling choices may use neutral defaults
+only when they do not imply a scientific or hardware fact.
+
+### 5. Initialize and validate the truth model
 
 For a new package, run:
 
@@ -84,7 +107,7 @@ python3 "$SKILL_DIR/scripts/run_synthetic_benchmark.py" \
   --report /tmp/ssr_synthetic_benchmark.md
 ```
 
-### 5. Lock topology before detail
+### 6. Lock topology before detail
 
 Create a simple 2D engineering storyboard or gray-box scene. Confirm source to
 sink order, port directions, branch-causing components, path width changes,
@@ -95,7 +118,7 @@ Load [physical-plausibility.md](references/physical-plausibility.md) for
 domain-specific rules. For optical benches, also load
 [optical-bench-failure-patterns.md](references/optical-bench-failure-patterns.md).
 
-### 6. Build script-first
+### 7. Build script-first
 
 Prefer a reproducible Blender Python scene. Keep geometry constructors,
 materials, coordinates, paths, camera, lighting, and exports in code. Use the
@@ -109,7 +132,7 @@ Where practical, assign these object properties:
 - support: `ssr_role=support`, `ssr_supports`;
 - annotation: `ssr_role=annotation`.
 
-### 7. Audit, render, and inspect
+### 8. Audit, render, and inspect
 
 Audit a saved scene:
 
@@ -133,7 +156,7 @@ Inspect the whole frame and close crops of every junction, port cluster,
 support, reflector, branch device, and endpoint. Record at least one rejected
 round and one corrected round for a complex figure. Never pre-write acceptance.
 
-### 8. Annotate and package
+### 9. Annotate and package
 
 Add labels only after geometry and paths pass QA. Keep text horizontal,
 editable, concise, and directly associated with its target. Use an SVG overlay
@@ -170,6 +193,8 @@ validator tests, not visual templates and not evidence for a user project.
 Do not call a complex figure complete unless:
 
 - every path starts and ends at a declared interface;
+- every factual uncertainty was user-confirmed, authoritatively resolved,
+  intentionally omitted, or explicitly left as an unresolved schematic;
 - every turn, branch, merge, conversion, and width change has a valid cause;
 - no path crosses opaque or unrelated geometry;
 - active areas are attached to the correct housing face;

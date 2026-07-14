@@ -32,7 +32,10 @@ Split incompatible goals. A realistic physical setup and an abstract network ana
 - Identify the user's approved reference and the aspect to learn from it: topology, product form, camera angle, material, or label style.
 - Do not treat a decorative render as proof of physical behavior.
 
-Pass when every essential component has at least one source or a declared schematic assumption.
+Pass when every essential component has at least one source. A factual unknown
+cannot pass as a self-declared assumption: record it, ask the user first, and
+search authoritative sources only if the user cannot confirm it. If it remains
+unresolved, omit it or reserve it for an explicitly unresolved schematic inset.
 
 ### Gate 1: evidence matrix
 

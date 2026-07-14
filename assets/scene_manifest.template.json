@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "title": "Scientific system render",
   "domain": "general",
   "truth_level": "topology-faithful",
@@ -155,19 +155,20 @@
   "routes": [],
   "loops": [],
   "motions": [],
-  "assumptions": [
+  "assumptions": [],
+  "open_questions": [
     {
-      "id": "A1",
-      "statement": "Starter geometry is schematic until replaced by project evidence",
-      "impact": "medium",
+      "id": "Q1",
+      "question": "Which project evidence resolves the starter component geometry and interfaces?",
+      "blocking": true,
       "status": "open"
     }
   ],
-  "open_questions": [],
   "acceptance_criteria": [
     "Every path starts and ends at a declared port",
     "No path crosses opaque or unrelated geometry",
     "Every elevated component is attached to a support",
-    "The final no-text render remains legible on a white background"
+    "The final no-text render remains legible on a white background",
+    "Every factual unknown is user-confirmed, authoritatively resolved, intentionally omitted, or visibly marked unresolved"
   ]
 }

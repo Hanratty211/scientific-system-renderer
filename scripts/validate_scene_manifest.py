@@ -17,6 +17,12 @@ ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
 OPACITY = {"opaque", "transparent", "translucent", "mixed", "not-applicable"}
 DIRECTIONS = {"in", "out", "bidirectional", "none"}
 CONFIDENCE = {"verified", "inferred", "schematic", "unknown"}
+RESOLUTION_KINDS = {
+    "user-confirmed",
+    "authoritative-source",
+    "intentionally-omitted",
+    "schematic-placeholder",
+}
 PATH_STYLES = {
     "straight",
     "ray",
@@ -115,6 +121,7 @@ def detect_parent_cycle(components: dict[str, dict[str, Any]], start: str) -> bo
 def validate(data: dict[str, Any]) -> list[Finding]:
     findings: list[Finding] = []
     v11 = schema_at_least(data, 1, 1)
+    v12 = schema_at_least(data, 1, 2)
     required = (
         "schema_version",
         "title",
@@ -204,6 +211,8 @@ def validate(data: dict[str, Any]) -> list[Finding]:
         evidence_refs(findings, component.get("evidence", []), cloc, sources)
         if component.get("confidence") not in CONFIDENCE:
             add(findings, "error", "C008", cloc, f"invalid confidence: {component.get('confidence')!r}")
+        elif v12 and component.get("confidence") == "unknown":
+            add(findings, "error", "U001", cloc, "unknown factual component must be resolved, omitted, or moved to an explicit unresolved schematic")
         mount = component.get("mount")
         if not isinstance(mount, dict):
             add(findings, "error", "C009", cloc, "mount must be an object")
@@ -687,9 +696,44 @@ def validate(data: dict[str, Any]) -> list[Finding]:
         add(findings, "warning", "V002", "deliverables", "no deliverables are declared")
     if not data.get("acceptance_criteria"):
         add(findings, "error", "V003", "acceptance_criteria", "acceptance criteria are required")
+    assumptions = data.get("assumptions", [])
+    if not isinstance(assumptions, list):
+        add(findings, "error", "U002", "assumptions", "assumptions must be a list")
+    elif v12:
+        for index, assumption in enumerate(assumptions):
+            loc = f"assumptions[{index}]"
+            if not isinstance(assumption, dict):
+                add(findings, "error", "U003", loc, "assumption must be an object")
+                continue
+            if assumption.get("status") != "resolved":
+                add(findings, "error", "U004", loc, "open factual assumption blocks detailed modeling")
+                continue
+            resolution = assumption.get("resolution")
+            if not isinstance(resolution, dict) or resolution.get("kind") not in RESOLUTION_KINDS:
+                add(findings, "error", "U005", loc, "resolved assumption needs an allowed resolution.kind")
+
     open_questions = data.get("open_questions", [])
-    if isinstance(open_questions, list) and open_questions:
-        add(findings, "warning", "V004", "open_questions", f"{len(open_questions)} open question(s) remain")
+    if not isinstance(open_questions, list):
+        add(findings, "error", "U006", "open_questions", "open_questions must be a list")
+    elif open_questions:
+        if not v12:
+            add(findings, "warning", "V004", "open_questions", f"{len(open_questions)} open question(s) remain")
+        for index, question in enumerate(open_questions):
+            loc = f"open_questions[{index}]"
+            if not v12:
+                continue
+            if not isinstance(question, dict) or not question.get("id") or not question.get("question"):
+                add(findings, "error", "U007", loc, "schema 1.2 question needs id and question")
+                continue
+            status = question.get("status", "open")
+            blocking = question.get("blocking", True)
+            if status != "resolved":
+                severity = "error" if blocking else "warning"
+                add(findings, severity, "U008", loc, "unresolved question remains" + (" and blocks modeling" if blocking else ""))
+                continue
+            resolution = question.get("resolution")
+            if not isinstance(resolution, dict) or resolution.get("kind") not in RESOLUTION_KINDS:
+                add(findings, "error", "U009", loc, "resolved question needs an allowed resolution.kind")
     return findings
 
 

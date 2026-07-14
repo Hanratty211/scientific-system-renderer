@@ -11,6 +11,7 @@ Before modeling, establish a machine-readable truth model for the figure.
 7. Attach every elevated component to a plausible support and reject interpenetration, visible gaps at attachment points, and unsupported mass.
 8. Preserve scale hierarchy. A microstructure needs a parent device and a linked inset; it must not float beside the system at an implied common scale.
 9. Distinguish simultaneous hardware from sequential states. One reused device must not become a stack of physical devices merely to show time multiplexing.
-10. Treat references as evidence. Record assumptions and unknowns instead of silently inventing geometry or behavior.
+10. Treat references as evidence. Never promote an unknown into an assumption by personal judgment. Record it, ask the user first, then search authoritative sources only if the user cannot resolve it.
+11. If neither the user nor authoritative evidence resolves a factual unknown, omit the affected detail or mark a visibly schematic placeholder as `unresolved`. Photorealistic invention is forbidden.
 
 Critical unresolved topology, interface, scale, or boundary behavior blocks detailed modeling.

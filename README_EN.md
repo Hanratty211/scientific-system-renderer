@@ -65,7 +65,7 @@ Other agents can use a custom prompt, subagent, or command wrapper that points t
 
 - Generated images and look-alike product photos are not treated as hardware evidence.
 - Synthetic regression tests validate rules, not a project's design.
-- Missing critical interfaces, dimensions, or boundary behavior must be recorded as assumptions or block detailed modeling.
+- An agent must never guess a factual unknown: ask the user first, then consult authoritative manuals, papers, standards, or patents if the user cannot confirm it; omit the detail or mark it as an `unresolved` schematic if it remains uncertain.
 - Safety, medical, regulatory, and manufacturing acceptance still require qualified expert review.
 
 ## Open-Source and Data Boundary
