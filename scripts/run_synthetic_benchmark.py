@@ -42,7 +42,10 @@ def port(port_id: str, direction: str, media: list[str], face: str, *, multiple:
         "direction": direction,
         "media": media,
         "face": face,
+        "face_position": face,
         "allows_multiple": multiple,
+        "evidence": ["S1"],
+        "identity_confidence": "schematic",
     }
 
 
@@ -78,6 +81,8 @@ def component(
         "mount": {"required": False},
         "evidence": ["S1"],
         "confidence": "inferred",
+        "existence_status": "schematic-placeholder",
+        "existence_evidence": ["S1"],
     }
     if parent:
         value["parent"] = parent
@@ -156,8 +161,22 @@ def finish(
     motions: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     component_ids = [item["id"] for item in components]
+    used_ports = {
+        (connection[endpoint]["component"], connection[endpoint]["port"])
+        for connection in connections
+        for endpoint in ("source", "target")
+    }
+    for item in components:
+        for item_port in item.get("ports", []):
+            key = (item["id"], item_port["id"])
+            if key in used_ports:
+                item_port["connection_expectation"] = "connected"
+            else:
+                item_port["connection_expectation"] = "intentionally-open"
+                item_port["status_reason"] = "Unused by this synthetic validation view"
+                item_port["status_evidence"] = ["S1"]
     return {
-        "schema_version": "1.1",
+        "schema_version": "1.3",
         "title": case["title"],
         "domain": case["domain_family"],
         "truth_level": "synthetic topology-faithful validation",
@@ -694,6 +713,11 @@ REGRESSION_TESTS = [
     {"case_id": "integrated-chip-hierarchy", "kind": "coarse_child_scale", "expected_codes": ["H004"]},
     {"case_id": "automated-lab-sequence", "kind": "false_hardware_reuse", "expected_codes": ["S010"]},
     {"case_id": "open-thermal-fluid-route", "kind": "external_route_driver", "expected_codes": ["F012"]},
+    {"case_id": "optical-transmission-stack", "kind": "missing_component_existence_evidence", "expected_codes": ["C023"]},
+    {"case_id": "optical-transmission-stack", "kind": "missing_port_identity_evidence", "expected_codes": ["P008"]},
+    {"case_id": "optical-transmission-stack", "kind": "silently_unconnected_port", "expected_codes": ["T003"]},
+    {"case_id": "optical-transmission-stack", "kind": "unsupported_open_port", "expected_codes": ["T005", "T006"]},
+    {"case_id": "optical-transmission-stack", "kind": "open_port_still_used", "expected_codes": ["T004"]},
 ]
 
 
@@ -732,6 +756,23 @@ def mutate(manifest: dict[str, Any], kind: str) -> None:
         manifest["sequences"][0]["reused_components"] = ["scheduler"]
     elif kind == "external_route_driver":
         manifest["routes"][0]["driver_component"] = "collector"
+    elif kind == "missing_component_existence_evidence":
+        manifest["components"][0].pop("existence_evidence", None)
+    elif kind == "missing_port_identity_evidence":
+        manifest["components"][0]["ports"][0].pop("evidence", None)
+    elif kind == "silently_unconnected_port":
+        manifest["connections"] = manifest["connections"][1:]
+    elif kind == "unsupported_open_port":
+        target = manifest["components"][0]["ports"][0]
+        target["connection_expectation"] = "intentionally-open"
+        target.pop("status_reason", None)
+        target.pop("status_evidence", None)
+        manifest["connections"] = manifest["connections"][1:]
+    elif kind == "open_port_still_used":
+        target = manifest["components"][0]["ports"][0]
+        target["connection_expectation"] = "intentionally-open"
+        target["status_reason"] = "Synthetic contradiction"
+        target["status_evidence"] = ["S1"]
     else:
         raise ValueError(f"unknown mutation kind: {kind}")
 

@@ -19,6 +19,9 @@ injected, materially misleading failure is detected. It currently exercises:
 - open driven routes;
 - closed transport loops;
 - linked microstructure views.
+- component-existence evidence;
+- per-port identity evidence;
+- required-versus-open port connection states.
 
 Run:
 
@@ -34,7 +37,10 @@ A passing fixture confirms validator behavior only. It does not prove that a
 Blender scene is physically correct, visually clear, dimensionally faithful,
 or supported by adequate project evidence. Every completed render still needs
 source tracing, scene audit, whole-frame inspection, and critical-junction
-crops.
+crops. The additional regressions assert that missing existence evidence,
+missing port evidence, and a silently removed required connection are rejected.
+It also rejects an open port without a reason/evidence and a port marked open
+while still used by a connection.
 
 When adding a new domain, define an original synthetic case and one deliberate
 failure that would materially mislead a reader. Do not add publisher figures,

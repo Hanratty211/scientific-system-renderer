@@ -7,6 +7,7 @@ Run inside Blender:
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import re
 import sys
@@ -14,6 +15,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 import bpy
+from bpy_extras.object_utils import world_to_camera_view
 from mathutils import Vector
 
 
@@ -22,6 +24,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--strict-metadata", action="store_true")
+    parser.add_argument("--strict-endpoints", action="store_true")
+    parser.add_argument("--endpoint-tolerance", type=float, default=0.04)
     parser.add_argument("--min-width", type=int, default=3000)
     return parser.parse_args(argv)
 
@@ -56,6 +60,87 @@ def endpoint_component(value: str) -> str:
     return value.split(":", 1)[0] if value else ""
 
 
+def endpoint_key(value: str) -> tuple[str, str] | None:
+    parts = value.split(":", 1)
+    if len(parts) != 2 or not all(parts):
+        return None
+    return parts[0], parts[1]
+
+
+def vector_property(obj: bpy.types.Object, key: str) -> Vector | None:
+    value = obj.get(key)
+    try:
+        if value is not None and len(value) == 3:
+            return Vector((float(value[0]), float(value[1]), float(value[2])))
+    except (TypeError, ValueError):
+        pass
+    return None
+
+
+def connection_points(obj: bpy.types.Object) -> list[Vector]:
+    if obj.type == "CURVE":
+        points: list[Vector] = []
+        for spline in obj.data.splines:
+            values: list[Vector] = []
+            if spline.type == "BEZIER":
+                controls = list(spline.bezier_points)
+                segment_count = len(controls) if spline.use_cyclic_u else max(0, len(controls) - 1)
+                for index in range(segment_count):
+                    first = controls[index]
+                    second = controls[(index + 1) % len(controls)]
+                    for sample in range(13):
+                        if index and sample == 0:
+                            continue
+                        t = sample / 12.0
+                        one_minus_t = 1.0 - t
+                        value = (
+                            one_minus_t**3 * first.co
+                            + 3.0 * one_minus_t**2 * t * first.handle_right
+                            + 3.0 * one_minus_t * t**2 * second.handle_left
+                            + t**3 * second.co
+                        )
+                        values.append(value)
+            else:
+                values = [Vector((point.co.x, point.co.y, point.co.z)) for point in spline.points]
+            for value in values:
+                world = obj.matrix_world @ value
+                if not points or (world - points[-1]).length > 1e-7:
+                    points.append(world)
+        if len(points) >= 2:
+            return points
+    start_local = vector_property(obj, "ssr_start_anchor_local")
+    end_local = vector_property(obj, "ssr_end_anchor_local")
+    if start_local is not None and end_local is not None:
+        return [obj.matrix_world @ start_local, obj.matrix_world @ end_local]
+    start = vector_property(obj, "ssr_start_anchor")
+    end = vector_property(obj, "ssr_end_anchor")
+    return [start, end] if start is not None and end is not None else []
+
+
+def projected_points(scene: bpy.types.Scene, points: list[Vector]) -> list[tuple[float, float, float]]:
+    if scene.camera is None:
+        return []
+    return [tuple(world_to_camera_view(scene, scene.camera, point)) for point in points]
+
+
+def segments_cross(
+    a: tuple[float, float],
+    b: tuple[float, float],
+    c: tuple[float, float],
+    d: tuple[float, float],
+    epsilon: float = 1e-5,
+) -> bool:
+    rx, ry = b[0] - a[0], b[1] - a[1]
+    sx, sy = d[0] - c[0], d[1] - c[1]
+    denominator = rx * sy - ry * sx
+    if abs(denominator) <= epsilon:
+        return False
+    qpx, qpy = c[0] - a[0], c[1] - a[1]
+    t = (qpx * sy - qpy * sx) / denominator
+    u = (qpx * ry - qpy * rx) / denominator
+    return epsilon < t < 1.0 - epsilon and epsilon < u < 1.0 - epsilon
+
+
 def main() -> int:
     args = parse_args()
     scene = bpy.context.scene
@@ -80,6 +165,7 @@ def main() -> int:
     connections: list[bpy.types.Object] = []
     supports: defaultdict[str, list[bpy.types.Object]] = defaultdict(list)
     interfaces: defaultdict[str, list[bpy.types.Object]] = defaultdict(list)
+    port_anchors: dict[tuple[str, str], bpy.types.Object] = {}
     motion_envelopes: defaultdict[str, list[bpy.types.Object]] = defaultdict(list)
 
     for obj in scene.objects:
@@ -117,6 +203,13 @@ def main() -> int:
                 finding(errors, "B016", obj.name, "interface lacks ssr_attached_to")
             else:
                 interfaces[attached_to].append(obj)
+                port_id = str(obj.get("ssr_port_id", ""))
+                if port_id:
+                    key = (attached_to, port_id)
+                    if key in port_anchors:
+                        finding(errors, "B019", obj.name, f"duplicate interface anchor for {attached_to}:{port_id}")
+                    else:
+                        port_anchors[key] = obj
         elif role == "motion-envelope":
             moving_id = str(obj.get("ssr_envelope_for", ""))
             if not moving_id:
@@ -215,6 +308,70 @@ def main() -> int:
                     f"connection bounding box intersects unrelated opaque component {component_id}; inspect visually",
                 )
 
+    physical_connections = [
+        connection
+        for connection in connections
+        if str(connection.get("ssr_representation", "physical")) in {"physical", "contact"}
+    ]
+    screen_paths: dict[str, list[tuple[float, float, float]]] = {}
+    for connection in physical_connections:
+        source_text = str(connection.get("ssr_source", ""))
+        target_text = str(connection.get("ssr_target", ""))
+        source_key = endpoint_key(source_text)
+        target_key = endpoint_key(target_text)
+        points = connection_points(connection)
+        missing_geometry = not points
+        if missing_geometry and args.strict_endpoints:
+            finding(errors, "B052", connection.name, "connection has no auditable route endpoints; tag ssr_start_anchor/ssr_end_anchor or use a curve")
+        for endpoint_name, key, point in (
+            ("source", source_key, points[0] if points else None),
+            ("target", target_key, points[-1] if points else None),
+        ):
+            if key is None:
+                continue
+            anchor = port_anchors.get(key)
+            if anchor is None:
+                target = errors if args.strict_endpoints else warnings
+                finding(target, "B053", connection.name, f"{endpoint_name} has no interface anchor object for {key[0]}:{key[1]}")
+                continue
+            if point is not None:
+                gap = (point - anchor.matrix_world.translation).length
+                if gap > args.endpoint_tolerance:
+                    finding(
+                        errors,
+                        "B051",
+                        connection.name,
+                        f"{endpoint_name} endpoint is detached from {key[0]}:{key[1]} by {gap:.4f} scene units",
+                    )
+        projected = projected_points(scene, points)
+        if projected:
+            screen_paths[connection.name] = projected
+            if any(point[2] > 0 and not (0.0 <= point[0] <= 1.0 and 0.0 <= point[1] <= 1.0) for point in projected):
+                finding(warnings, "B054", connection.name, "physical route leaves the active camera frame; inspect for off-frame re-entry")
+
+    connection_by_name = {connection.name: connection for connection in physical_connections}
+    for first_name, second_name in itertools.combinations(screen_paths, 2):
+        first = connection_by_name[first_name]
+        second = connection_by_name[second_name]
+        first_endpoints = {str(first.get("ssr_source", "")), str(first.get("ssr_target", ""))}
+        second_endpoints = {str(second.get("ssr_source", "")), str(second.get("ssr_target", ""))}
+        if first_endpoints & second_endpoints:
+            continue
+        first_points = screen_paths[first_name]
+        second_points = screen_paths[second_name]
+        crossed = any(
+            segments_cross(a[:2], b[:2], c[:2], d[:2])
+            for a, b in zip(first_points, first_points[1:])
+            for c, d in zip(second_points, second_points[1:])
+        )
+        if crossed:
+            finding(
+                warnings,
+                "B050",
+                f"{first_name} / {second_name}",
+                "physical routes form an interior X-crossing in camera projection; separate them visually or add an explicit bridge/junction",
+            )
+
     report = {
         "scene": bpy.data.filepath,
         "engine": scene.render.engine,
@@ -227,7 +384,7 @@ def main() -> int:
         "errors": errors,
         "warnings": warnings,
         "result": "FAIL" if errors else "PASS",
-        "note": "AABB intersection findings are conservative candidates and require visual inspection.",
+        "note": "AABB and screen-space crossing findings are conservative candidates and require full-frame plus detail-crop inspection.",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")

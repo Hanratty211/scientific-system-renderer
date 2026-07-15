@@ -1,75 +1,207 @@
-# `scientific-system-renderer` 技能
+# Scientific System Renderer
 
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
+[![Skill version](https://img.shields.io/badge/skill-v1.3.0-0b7285.svg)](manifest.yaml)
 [English](README_EN.md)
 
-这是一个由 Codex、Claude Code 或其他编程 Agent 调用的科研系统渲染技能，用证据、接口和物理约束驱动 Blender/SVG 架构图、实物连接图与元器件图的生成和审查。
+面向 Codex、Claude Code 等 Agent 的科研系统渲染 Skill。它把实物照片、
+说明书、论文方法、CAD、用户标注和物理约束整理成可验证的 truth model，
+再生成或审查 Blender/SVG 架构图、实物连接图、元器件图和机制图。
 
-## 适合用它做什么
+它不是“一键美化器”。核心目标是让图中的器件、端口、连接、支架、尺度、
+时序和信号路径都能追溯到证据，并用自动检查和高清局部 QA 阻止“画得像，
+但接错了”的结果进入最终稿。
 
-- 绘制系统架构、真实设备连接、实验装置、元器件设备和机制子图。
-- 把产品照片、数据手册、CAD、草图和技术约束转成可复现的 Blender 场景。
-- 组合高清无文字 3D 渲染与可编辑 SVG 标注。
-- 检查光路、线缆、流路、热路、无线场、机械接触、运动范围和支架是否可信。
-- 修复穿模、悬空、端口错误、方向错误、尺度误导、时序状态误画成多套硬件等问题。
+## 适用场景
 
-## 典型请求
+- 光学、电子、RF、流体、热学、真空、机械、机器人、生物医学和工业系统；
+- 论文或汇报中的 3D 实验平台、系统架构、器件视图和机制 inset；
+- 高分辨率透明无文字底图与可编辑 SVG 标注；
+- 修复光路/线缆穿模、器件悬空、端口接错、比例失真和时序误画；
+- 对已有 Blender 工程做物理、接口、构图和交付审计。
 
-- “根据这些实物照片和手册，画一张真实设备连接图，输出 `.blend`、透明 PNG 和标注 SVG。”
-- “把这个跨电子、流体和机械的系统整理成架构图与实物图两个 panel。”
-- “审查现有 Blender 场景，找出不可能的路径、悬空支架和错误接口并修复。”
-- “给这个器件制作正交元器件图，标出有效面、端口和安装位置。”
+## v1.3 的关键约束
 
-## 你需要提供
+### 1. 器件存在性单独取证
 
-- 想表达的系统结论和目标受众。
-- 可用的照片、手册、数据表、CAD、草图、尺寸或接口说明。
-- 哪些细节必须真实，哪些可以明确标为 schematic。
-- 输出尺寸、背景、视角、文件格式和是否需要可编辑标注。
+“这种系统通常有该器件”不等于“这套设备里确实有”。每个最终出现的器件
+必须是用户确认、来源可见、权威资料支持，或明确标成 schematic placeholder。
 
-## 产出
+### 2. 逐端口身份图
 
-- 可复现的 Blender 建模脚本和 `.blend` 工程。
-- 高清无文字透明 PNG 与白底检查图。
-- 可编辑 SVG 标注版及其 PNG 预览。
-- `scene_manifest.json`、来源台账、QA 日志和再生成命令。
-- 对已有图稿的物理、视觉和交付风险清单。
+端口数量正确还不够。每个端口都要记录稳定 ID、所在面与行列位置、方向、
+介质、身份依据和置信度。宽幅总览只用于场景关系，端口顺序优先服从近景证据。
 
-## Agent 接入
+### 3. 不允许“静默空端口”
 
-请保留整个技能目录，不要只复制 `SKILL.md`，因为工作流依赖 `manifest.yaml`、`static/`、`references/`、`scripts/` 和 `assets/`。
+每个端口必须声明为：
 
-Codex 可将稳定 checkout 链接到技能目录：
+- `connected`：必须存在连接；
+- `intentionally-open`：必须写明原因和证据；
+- `outside-figure`：必须说明连接延伸到图外并给出证据。
+
+### 4. 世界坐标与最终相机双重检查
+
+连接既要在 3D 中不穿模，也要在最终画面中不形成无意义的 X 交叉、离框后
+重新进入、假接到邻近端口等歧义。端点必须落在显式 port anchor 上。
+
+### 5. 用户纠正会使旧验收失效
+
+只要用户更正器件、端口、连接或工作状态，受影响的 manifest、模型、路径、
+标注、caption、局部 crop 和 QA 都必须重做，不能只修画面上的一个症状。
+
+## 从真实绘图返工中提炼的问题
+
+本 Skill 的强化来自一次真实仪器平台图的多轮纠错，已完全匿名化，未收录任何
+项目素材。主要教训是：
+
+| 失败模式 | 原因 | 新的防线 |
+|---|---|---|
+| 凭总览补出并不存在的机箱 | 把“合理”当成“存在” | component existence gate |
+| 端口数量对但身份和上下顺序错 | 没有逐面 port map | schema 1.3 port evidence |
+| 漏掉短跳线，端口空着也通过 | 未连接仅是 warning | `connection_expectation` 硬错误 |
+| 不确定器件类型时先猜后问 | 缺少不确定性阻断 | 先问用户，再查权威来源 |
+| 光纤/线缆离框、回穿、端点悬空 | 按外观拉曲线 | route corridor + endpoint anchors |
+| 3D 不相交但画面出现 X 交叉 | 只查世界坐标 | camera-space crossing audit |
+| 整图看不出小接头错误 | 缺少局部证据 | deterministic detail crops |
+| 用户改正后旧 caption/QA 仍保留 | 修改未向下游传播 | correction invalidation protocol |
+| 透明 PNG 在某些背景难判断 | 只看单一预览 | white/dark/checkerboard QA |
+| 标注过早加入，线和字反复打架 | 底图未锁定 | no-text master first |
+
+## 工作流
+
+```text
+证据清单
+  -> 器件存在性锁定
+  -> 逐面端口图与 port-to-port 表
+  -> scene_manifest.json
+  -> 2D storyboard / gray box
+  -> 脚本化 Blender 建模
+  -> 端点、碰撞、支架、投影审计
+  -> 透明无文字高清渲染
+  -> 全图 + 接头/支架/分支局部 QA
+  -> 可编辑 SVG 标注
+  -> 交付与公开发布审计
+```
+
+Agent 会从 [SKILL.md](SKILL.md) 进入，根据 [manifest.yaml](manifest.yaml)
+加载最小必要规则。物理连接任务会额外加载
+[interface-and-route-qa.md](references/interface-and-route-qa.md)。
+
+## 安装
+
+### Codex
 
 ```bash
-ln -s /absolute/path/scientific-system-renderer \
-  ~/.codex/skills/scientific-system-renderer
+git clone https://github.com/Hanratty211/scientific-system-renderer.git
+mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
+ln -s "$(pwd)/scientific-system-renderer" \
+  "${CODEX_HOME:-$HOME/.codex}/skills/scientific-system-renderer"
 ```
 
-重新打开 Codex 会话后，自然描述任务或明确说“使用 `$scientific-system-renderer`”。
+重新打开任务后，直接描述科研绘图需求；也可明确调用
+`$scientific-system-renderer`。
 
-Claude Code 建议保留稳定 checkout，再在 `~/.claude/agents/scientific-system-renderer.md` 建一个薄 wrapper：
+### Claude Code 或其他 Agent
 
-```markdown
----
-name: scientific-system-renderer
-description: Build and audit evidence-grounded scientific system renders.
----
-Read `/absolute/path/scientific-system-renderer/SKILL.md` first and follow it.
-Load supporting files from that skill directory only when needed.
-Do not replace its truth-model and visual-QA workflow with a generic response.
+让 Agent 先读取仓库根目录的 `SKILL.md`，并按需读取 `manifest.yaml`、
+`static/`、`references/`、`scripts/` 和 `assets/`。不要只复制 `SKILL.md`，
+否则会丢失验证器、模板和领域规则。
+
+## 快速开始
+
+安装 Python 图像依赖：
+
+```bash
+python3 -m pip install -r requirements.txt
 ```
 
-其他 Agent 只需支持读取本地文件和执行工具，即可用自定义 prompt、subagent 或命令 wrapper 指向真实的 `SKILL.md`。
+初始化一个渲染包：
 
-## 边界
+```bash
+python3 scripts/init_render_project.py render-package \
+  --title "Example system" --domain general \
+  --views architecture,physical-setup,component-sheet
+```
 
-- 该技能不会把生成图或相似产品照片当作真实硬件证据。
-- 合成回归测试只验证规则，不证明具体项目的设计正确。
-- 任何事实性不确定项都不得由 Agent 自行猜测：先向用户提问；用户无法确认时再查厂商资料、论文、标准或专利；仍无法确认则省略，或明确标为 `unresolved` 的示意占位。
-- 涉及安全、医疗、法规或制造验收时，输出不能替代领域专家审查。
+编辑 `render-package/scene_manifest.json`，替换 starter evidence 并解决所有
+`open_questions`，然后运行：
 
-## 开源与数据边界
+```bash
+python3 scripts/validate_scene_manifest.py \
+  render-package/scene_manifest.json \
+  --report render-package/qa/manifest_validation.md
+```
 
-仓库只包含技能说明、原创代码、通用模板和原创合成测试，不包含论文 PDF、论文图片、逐篇论文摘要、DOI/题录语料、厂商图片、用户项目素材或私有路径。用户为具体项目引入的参考资料不应提交到本仓库，除非其许可证明确允许再分发。
+Blender 场景审计：
 
-代码和文档采用 Apache-2.0 许可证。第三方输入材料仍受各自许可证和使用条款约束。
+```bash
+blender --background render-package/final/system.blend \
+  --python scripts/audit_blender_scene.py -- \
+  --output render-package/qa/blender_scene_audit.json \
+  --strict-endpoints
+```
+
+渲染与局部 QA：
+
+```bash
+python3 scripts/render_qa.py render-package/final/system_no_text.png \
+  --require-alpha --min-width 3000 \
+  --contact-sheet render-package/qa/background_contact_sheet.png \
+  --report render-package/qa/render_qa.md
+
+python3 scripts/generate_detail_crops.py \
+  render-package/final/system_no_text.png \
+  render-package/qa/qa_regions.json \
+  render-package/qa/crops \
+  --contact-sheet render-package/qa/detail_contact_sheet.png \
+  --report render-package/qa/detail_crops.md
+```
+
+## 自测与发布检查
+
+```bash
+python3 scripts/run_synthetic_benchmark.py \
+  --report /tmp/ssr_synthetic_benchmark.md
+python3 scripts/audit_public_release.py .
+python3 -m py_compile scripts/*.py assets/build_scene.template.py
+```
+
+合成 benchmark 覆盖光学、数字计算、可穿戴、生物医学、机器人、热流体、
+软体系统、机械结构和微流控等原创测试场景。它只验证规则，不证明具体项目的
+设备和拓扑正确。
+
+## 仓库结构
+
+```text
+SKILL.md                       Agent 入口与完成门
+manifest.yaml                 路由与按需加载规则
+static/core/                  始终生效的 truth contract
+references/                   物理、接口、Blender、视觉与证据规范
+scripts/                      manifest、Blender、渲染、crop、发布审计
+assets/                       原创通用模板与合成 benchmark
+evals/                        Agent 行为评测样例
+agents/                       Agent 接入元数据
+```
+
+## 开源与隐私边界
+
+本仓库只包含原创通用说明、代码、模板和合成测试，不包含：
+
+- 用户照片、视频、论文 PDF、论文图片或厂商宣传图；
+- 用户项目生成图、`.blend` 工程或本地实验日志；
+- 私有绝对路径、账号标识、凭据或访问令牌；
+- 可识别具体未公开实验平台的端口图和接线表。
+
+项目素材应保留在项目自己的 `references/` 或私有目录，不得提交到本仓库，
+除非许可证明确允许再分发。提交前运行 `audit_public_release.py`。
+
+## 局限
+
+- 自动 AABB、端点和二维交叉检查是保守候选检测，不能替代人工视觉审查；
+- 通用规则不能证明特定设备的安全性、法规符合性或制造可行性；
+- 缺少证据时，Skill 会阻断、询问、检索或省略，而不是自动补全硬件事实。
+
+## License
+
+[Apache License 2.0](LICENSE)。用户输入和第三方资料仍受其原始许可证约束。

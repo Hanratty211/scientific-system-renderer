@@ -1,5 +1,5 @@
 name: scientific-system-renderer
-version: 1.2.0
+version: 1.3.0
 description: >
   Router manifest for evidence-grounded scientific system rendering. Core
   physical and QA rules load for every task; route and domain references load
@@ -21,6 +21,7 @@ routes:
     preferred_output: Script-built Blender scene plus transparent no-text PNG and editable SVG labels.
     references:
       - references/workflow.md
+      - references/interface-and-route-qa.md
       - references/physical-plausibility.md
       - references/blender-patterns.md
       - references/visual-and-delivery.md
@@ -29,6 +30,7 @@ routes:
     preferred_output: Orthographic or controlled-perspective Blender render with editable callouts.
     references:
       - references/evidence-and-provenance.md
+      - references/interface-and-route-qa.md
       - references/blender-patterns.md
       - references/visual-and-delivery.md
   mechanism_inset:
@@ -42,6 +44,7 @@ routes:
     preferred_output: High-resolution no-text render plus SVG overlay and raster preview.
     references:
       - references/workflow.md
+      - references/interface-and-route-qa.md
       - references/blender-patterns.md
       - references/visual-and-delivery.md
   audit_repair:
@@ -49,6 +52,7 @@ routes:
     preferred_output: Findings, corrected reproducible source, revised render, and before/after QA record.
     references:
       - references/workflow.md
+      - references/interface-and-route-qa.md
       - references/physical-plausibility.md
       - references/blender-patterns.md
 
@@ -66,3 +70,5 @@ references:
       path: references/workflow.md
     - condition: an optical bench is being built or repeated optical path errors are being repaired
       path: references/optical-bench-failure-patterns.md
+    - condition: real devices, front panels, ports, jumpers, cables, tubes, fibers, supports, endpoints, or user hardware corrections are involved
+      path: references/interface-and-route-qa.md

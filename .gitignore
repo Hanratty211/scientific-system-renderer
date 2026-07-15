@@ -2,3 +2,15 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+*.blend
+*.blend1
+*.jpeg
+*.jpg
+*.mov
+*.mp4
+*.pdf
+*.png
+*.tif
+*.tiff
+outputs/
+intermediate/

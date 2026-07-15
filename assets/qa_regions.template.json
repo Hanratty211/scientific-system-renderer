@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "coordinate_system": "normalized image coordinates [x0, y0, x1, y1]",
+  "regions": [
+    {
+      "id": "source-interface",
+      "label": "Source housing, declared port, and first connection segment",
+      "box": [0.05, 0.25, 0.35, 0.75],
+      "padding": 0.03,
+      "required": true
+    },
+    {
+      "id": "sink-interface",
+      "label": "Final connection segment, declared port, and sink housing",
+      "box": [0.65, 0.25, 0.95, 0.75],
+      "padding": 0.03,
+      "required": true
+    }
+  ]
+}

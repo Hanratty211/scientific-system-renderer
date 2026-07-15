@@ -17,6 +17,9 @@ ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
 OPACITY = {"opaque", "transparent", "translucent", "mixed", "not-applicable"}
 DIRECTIONS = {"in", "out", "bidirectional", "none"}
 CONFIDENCE = {"verified", "inferred", "schematic", "unknown"}
+EXISTENCE_STATUS = {"user-confirmed", "source-visible", "authoritative-source", "schematic-placeholder"}
+PORT_IDENTITY_CONFIDENCE = {"verified", "inferred", "schematic"}
+PORT_CONNECTION_EXPECTATIONS = {"connected", "intentionally-open", "outside-figure"}
 RESOLUTION_KINDS = {
     "user-confirmed",
     "authoritative-source",
@@ -95,9 +98,18 @@ def evidence_refs(
     value: Any,
     location: str,
     known_sources: set[str],
+    *,
+    required: bool = False,
+    missing_code: str = "E010",
 ) -> None:
     if not isinstance(value, list) or not value:
-        add(findings, "warning", "E010", location, "no evidence reference")
+        add(
+            findings,
+            "error" if required else "warning",
+            missing_code,
+            location,
+            "no evidence reference",
+        )
         return
     if not known_sources:
         return
@@ -122,6 +134,7 @@ def validate(data: dict[str, Any]) -> list[Finding]:
     findings: list[Finding] = []
     v11 = schema_at_least(data, 1, 1)
     v12 = schema_at_least(data, 1, 2)
+    v13 = schema_at_least(data, 1, 3)
     required = (
         "schema_version",
         "title",
@@ -209,6 +222,20 @@ def validate(data: dict[str, Any]) -> list[Finding]:
             add(findings, "error", "C006", cloc, "capabilities must be a list")
             capabilities = []
         evidence_refs(findings, component.get("evidence", []), cloc, sources)
+        existence_status = component.get("existence_status")
+        if v13 and existence_status not in EXISTENCE_STATUS:
+            add(findings, "error", "C022", cloc, f"invalid or missing existence_status: {existence_status!r}")
+        elif existence_status is not None and existence_status not in EXISTENCE_STATUS:
+            add(findings, "error", "C022", cloc, f"invalid existence_status: {existence_status!r}")
+        if v13 or "existence_evidence" in component:
+            evidence_refs(
+                findings,
+                component.get("existence_evidence", []),
+                f"{cloc}.existence_evidence",
+                sources,
+                required=v13,
+                missing_code="C023",
+            )
         if component.get("confidence") not in CONFIDENCE:
             add(findings, "error", "C008", cloc, f"invalid confidence: {component.get('confidence')!r}")
         elif v12 and component.get("confidence") == "unknown":
@@ -277,6 +304,27 @@ def validate(data: dict[str, Any]) -> list[Finding]:
                 add(findings, "error", "P006", ploc, "media must be a non-empty list")
             if not port.get("face"):
                 add(findings, "warning", "P007", ploc, "port has no local face/orientation label")
+            if v13 or "evidence" in port:
+                evidence_refs(
+                    findings,
+                    port.get("evidence", []),
+                    f"{ploc}.evidence",
+                    sources,
+                    required=v13,
+                    missing_code="P008",
+                )
+            identity_confidence = port.get("identity_confidence")
+            if v13 and identity_confidence not in PORT_IDENTITY_CONFIDENCE:
+                add(findings, "error", "P009", ploc, f"invalid or missing identity_confidence: {identity_confidence!r}")
+            elif identity_confidence is not None and identity_confidence not in PORT_IDENTITY_CONFIDENCE:
+                add(findings, "error", "P009", ploc, f"invalid identity_confidence: {identity_confidence!r}")
+            if v13 and not port.get("face_position"):
+                add(findings, "error", "P010", ploc, "port needs a face_position such as front-row-2-upper")
+            expectation = port.get("connection_expectation")
+            if v13 and expectation not in PORT_CONNECTION_EXPECTATIONS:
+                add(findings, "error", "P011", ploc, f"invalid or missing connection_expectation: {expectation!r}")
+            elif expectation is not None and expectation not in PORT_CONNECTION_EXPECTATIONS:
+                add(findings, "error", "P011", ploc, f"invalid connection_expectation: {expectation!r}")
 
     for component_id, component in components.items():
         parent = component.get("parent")
@@ -454,10 +502,29 @@ def validate(data: dict[str, Any]) -> list[Finding]:
                 f"port is used by {count} connections without a declared splitter, hub, bus, manifold, or switch capability",
             )
 
-    for key in sorted(set(ports) - set(endpoint_use)):
+    for key, port in sorted(ports.items()):
         component_id, port_id = key
-        if ports[key].get("direction") != "none":
-            add(findings, "warning", "T002", f"port:{component_id}:{port_id}", "declared port is unconnected")
+        count = endpoint_use.get(key, 0)
+        expectation = port.get("connection_expectation")
+        location = f"port:{component_id}:{port_id}"
+        if v13:
+            if expectation == "connected" and count == 0:
+                add(findings, "error", "T003", location, "port is expected to be connected but has no declared connection")
+            if expectation in {"intentionally-open", "outside-figure"} and count:
+                add(findings, "error", "T004", location, f"port is marked {expectation} but is used by {count} connection(s)")
+            if expectation in {"intentionally-open", "outside-figure"}:
+                if not port.get("status_reason"):
+                    add(findings, "error", "T005", location, f"{expectation} port needs a status_reason")
+                evidence_refs(
+                    findings,
+                    port.get("status_evidence", []),
+                    f"{location}.status_evidence",
+                    sources,
+                    required=True,
+                    missing_code="T006",
+                )
+        elif count == 0 and port.get("direction") != "none":
+            add(findings, "warning", "T002", location, "declared port is unconnected")
 
     for component_id, component in components.items():
         if component.get("requires_body_interface") and component_id not in anatomical_contact_components:

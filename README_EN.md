@@ -1,75 +1,184 @@
-# `scientific-system-renderer` Skill
+# Scientific System Renderer
 
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
+[![Skill version](https://img.shields.io/badge/skill-v1.3.0-0b7285.svg)](manifest.yaml)
 [中文说明](README.md)
 
-An agent-operated skill for Codex, Claude Code, and other coding agents that uses evidence, interfaces, and physical constraints to create and audit Blender/SVG system architectures, physical setups, and component figures.
+An agent-operated skill for Codex, Claude Code, and other tool-using agents.
+It turns photographs, manuals, methods papers, CAD, user annotations, and
+physical constraints into an auditable truth model before creating or repairing
+Blender/SVG system architectures, physical setups, component sheets, and
+mechanism figures.
 
-## What It Is For
+This is not a one-click beautifier. Its purpose is to prevent figures that look
+plausible but contain invented devices, swapped ports, missing jumpers,
+detached routes, impossible intersections, floating supports, or misleading
+time states.
 
-- Create system architectures, real equipment connections, experimental setups, component sheets, and mechanism insets.
-- Turn product photos, datasheets, CAD, sketches, and technical constraints into reproducible Blender scenes.
-- Combine high-resolution no-text 3D renders with editable SVG annotation.
-- Check optical paths, cables, fluid routes, thermal paths, wireless fields, mechanical contacts, motion envelopes, and supports.
-- Repair intersections, floating parts, wrong ports or orientations, misleading scale, and temporal states drawn as duplicated hardware.
+## Where It Helps
 
-## Typical Requests
+- optics, electronics, RF, fluidics, thermal, vacuum, mechanical, robotics,
+  biomedical, laboratory, industrial, and hybrid systems;
+- publication-grade 3D setups, architecture panels, component views, and
+  mechanism insets;
+- high-resolution transparent no-text masters plus editable SVG annotation;
+- auditing or repairing Blender scenes with interface and physical-layout risk.
 
-- "Use these product photos and manuals to build a physical setup figure and deliver `.blend`, transparent PNG, and annotated SVG files."
-- "Separate this electronic, fluidic, and mechanical system into architecture and physical-setup panels."
-- "Audit this Blender scene for impossible routes, floating supports, and incorrect interfaces, then repair it."
-- "Create an orthographic component sheet showing the active area, ports, and mounting interface."
+## Hard Gates in v1.3
 
-## What You Provide
+1. **Component existence is independently evidenced.** A device appears only
+   when user-confirmed, source-visible, authoritatively supported, or explicitly
+   schematic.
+2. **Every visible port has an identity map.** Stable ID, face position,
+   direction, medium, evidence, and confidence are required.
+3. **There are no silent open ports.** Each port is `connected`,
+   `intentionally-open`, or `outside-figure`; the latter two require a reason
+   and evidence.
+4. **Routes are checked in world and camera space.** Endpoints must seat on
+   port anchors; ambiguous projected X-crossings and off-frame re-entry are
+   flagged.
+5. **User corrections invalidate dependent acceptance.** Truth data, geometry,
+   routes, labels, captions, crops, and QA must be rebuilt together.
 
-- The system claim and intended audience.
-- Available photographs, manuals, datasheets, CAD, sketches, dimensions, or interface definitions.
-- Which details must be faithful and which may be explicitly schematic.
-- Output size, background, view, file formats, and editability requirements.
+## Lessons Captured From Real Iteration
 
-## Outputs
+The workflow was hardened through an anonymized real-instrument rendering
+exercise. No project assets are included. Reusable failures and defenses are:
 
-- Reproducible Blender construction scripts and `.blend` projects.
-- High-resolution transparent no-text PNGs and white-background inspection composites.
-- Editable annotated SVGs and raster previews.
-- A `scene_manifest.json`, source ledger, QA log, and regeneration command.
-- Physical, visual, and delivery risk findings for existing figures.
+| Failure | Root cause | Defense |
+|---|---|---|
+| Invented chassis or instrument | plausibility mistaken for presence | component-existence gate |
+| Correct port count, wrong identity/order | no per-face map | schema 1.3 port evidence |
+| Missing short jumper still accepted | unused port was only a warning | hard connection expectation |
+| Component type guessed before asking | uncertainty did not block work | user-first escalation |
+| Cable overshoot, re-entry, detached ends | routes drawn by appearance | corridors and endpoint anchors |
+| 3D separation but 2D X-crossing | world-space checks only | camera-space audit |
+| Small connector error missed | full-frame review only | deterministic detail crops |
+| Old caption/QA survived a correction | change did not propagate | invalidation protocol |
+| Transparent output misread | one preview background | white/dark/checkerboard QA |
+| Labels repeatedly collided | annotation started too early | approve no-text master first |
 
-## Agent Integration
+## Workflow
 
-Keep the complete skill directory, not only `SKILL.md`, because the workflow depends on `manifest.yaml`, `static/`, `references/`, `scripts/`, and `assets/`.
+```text
+evidence intake
+  -> component-existence lock
+  -> per-face port map and port-to-port table
+  -> scene_manifest.json
+  -> storyboard / gray box
+  -> script-built Blender scene
+  -> endpoint, collision, support, and projection audit
+  -> high-resolution transparent no-text render
+  -> whole-frame and detail-crop QA
+  -> editable SVG annotation
+  -> delivery and public-release audit
+```
 
-For Codex, link a stable checkout into the skills directory:
+The agent enters through [SKILL.md](SKILL.md) and loads only the route-specific
+references listed in [manifest.yaml](manifest.yaml).
+
+## Install
+
+### Codex
 
 ```bash
-ln -s /absolute/path/scientific-system-renderer \
-  ~/.codex/skills/scientific-system-renderer
+git clone https://github.com/Hanratty211/scientific-system-renderer.git
+mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
+ln -s "$(pwd)/scientific-system-renderer" \
+  "${CODEX_HOME:-$HOME/.codex}/skills/scientific-system-renderer"
 ```
 
-Start a new Codex session, then describe the task naturally or explicitly request `$scientific-system-renderer`.
+Start a new task and describe the rendering request naturally, or invoke
+`$scientific-system-renderer` explicitly.
 
-For Claude Code, keep a stable checkout and create a thin wrapper at `~/.claude/agents/scientific-system-renderer.md`:
+### Claude Code and other agents
 
-```markdown
----
-name: scientific-system-renderer
-description: Build and audit evidence-grounded scientific system renders.
----
-Read `/absolute/path/scientific-system-renderer/SKILL.md` first and follow it.
-Load supporting files from that skill directory only when needed.
-Do not replace its truth-model and visual-QA workflow with a generic response.
+Point the agent to the repository's `SKILL.md`. Keep the complete checkout:
+`manifest.yaml`, `static/`, `references/`, `scripts/`, and `assets/` are part of
+the skill and should not be replaced by a copied prompt.
+
+## Quick Start
+
+```bash
+python3 -m pip install -r requirements.txt
+
+python3 scripts/init_render_project.py render-package \
+  --title "Example system" --domain general \
+  --views architecture,physical-setup,component-sheet
+
+python3 scripts/validate_scene_manifest.py \
+  render-package/scene_manifest.json \
+  --report render-package/qa/manifest_validation.md
 ```
 
-Other agents can use a custom prompt, subagent, or command wrapper that points to the real `SKILL.md`, provided they can read local files and execute tools.
+Audit a Blender scene and enforce endpoint anchors:
 
-## Boundaries
+```bash
+blender --background render-package/final/system.blend \
+  --python scripts/audit_blender_scene.py -- \
+  --output render-package/qa/blender_scene_audit.json \
+  --strict-endpoints
+```
 
-- Generated images and look-alike product photos are not treated as hardware evidence.
-- Synthetic regression tests validate rules, not a project's design.
-- An agent must never guess a factual unknown: ask the user first, then consult authoritative manuals, papers, standards, or patents if the user cannot confirm it; omit the detail or mark it as an `unresolved` schematic if it remains uncertain.
-- Safety, medical, regulatory, and manufacturing acceptance still require qualified expert review.
+Render and detail QA:
 
-## Open-Source and Data Boundary
+```bash
+python3 scripts/render_qa.py render-package/final/system_no_text.png \
+  --require-alpha --min-width 3000 \
+  --contact-sheet render-package/qa/background_contact_sheet.png \
+  --report render-package/qa/render_qa.md
 
-The repository contains only skill instructions, original code, generic templates, and original synthetic tests. It contains no paper PDFs, paper figures, paper-by-paper summaries, DOI or bibliographic corpus, manufacturer imagery, user project assets, or private paths. Project-specific references should not be committed unless their licenses explicitly permit redistribution.
+python3 scripts/generate_detail_crops.py \
+  render-package/final/system_no_text.png \
+  render-package/qa/qa_regions.json \
+  render-package/qa/crops \
+  --contact-sheet render-package/qa/detail_contact_sheet.png \
+  --report render-package/qa/detail_crops.md
+```
 
-Code and documentation are licensed under Apache-2.0. Third-party inputs remain subject to their own licenses and terms.
+## Validation
+
+```bash
+python3 scripts/run_synthetic_benchmark.py \
+  --report /tmp/ssr_synthetic_benchmark.md
+python3 scripts/audit_public_release.py .
+python3 -m py_compile scripts/*.py assets/build_scene.template.py
+```
+
+The original synthetic benchmark covers optics, digital computing, wearable
+and implantable systems, robotics, thermal-fluid systems, soft structures,
+mechanics, and microfluidics. It validates rules, not a real project's hardware.
+
+## Repository Layout
+
+```text
+SKILL.md                       agent entry and completion gate
+manifest.yaml                 route-specific reference loading
+static/core/                  always-on truth contract
+references/                   evidence, interfaces, physics, Blender, visual QA
+scripts/                      manifest, Blender, render, crop, release audits
+assets/                       original templates and synthetic fixtures
+evals/                        agent behavior examples
+agents/                       integration metadata
+```
+
+## Open-Source and Privacy Boundary
+
+This repository contains only original general instructions, code, templates,
+and synthetic fixtures. It excludes user photographs and videos, paper PDFs or
+figures, manufacturer imagery, project renders, `.blend` files, local logs,
+private paths, account identifiers, credentials, and identifiable unpublished
+connection maps. Run `audit_public_release.py` before publishing changes.
+
+## Limitations
+
+- AABB, endpoint, and projected-crossing checks are conservative candidates and
+  do not replace visual review.
+- General rules do not certify safety, regulatory compliance, or manufacturability.
+- When evidence is missing, the skill blocks, asks, researches, or omits; it
+  does not invent factual hardware details.
+
+## License
+
+[Apache License 2.0](LICENSE). User inputs and third-party references remain
+subject to their original licenses and terms.

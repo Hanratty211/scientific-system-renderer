@@ -71,6 +71,7 @@ Optional:
 - separate transparent device cutouts;
 - CAD or GLB export when downstream 3D editing is requested;
 - contact sheet and junction crops for review.
+- a deterministic crop index covering every port cluster, endpoint, support contact, branch, and dense route crossing.
 
 ## Resolution and typography
 

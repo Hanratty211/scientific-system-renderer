@@ -13,5 +13,10 @@ Before modeling, establish a machine-readable truth model for the figure.
 9. Distinguish simultaneous hardware from sequential states. One reused device must not become a stack of physical devices merely to show time multiplexing.
 10. Treat references as evidence. Never promote an unknown into an assumption by personal judgment. Record it, ask the user first, then search authoritative sources only if the user cannot resolve it.
 11. If neither the user nor authoritative evidence resolves a factual unknown, omit the affected detail or mark a visibly schematic placeholder as `unresolved`. Photorealistic invention is forbidden.
+12. Prove component existence separately from component function. A plausible device class, a crowded overview, or a prior render does not authorize an additional chassis, adapter, support, or instrument.
+13. Give every visible port a stable identity, face position, direction, medium, and evidence. Port count alone is not an interface map.
+14. Declare every port as connected, intentionally open, or outside the figure. An expected connection that is absent is an error; an open port without an evidenced reason is also an error.
+15. Seat every physical route on declared endpoint anchors. Check the complete route in world space and in final camera projection; avoid unexplained X-crossings, off-frame detours, and hidden re-entry.
+16. A user correction invalidates all dependent prior acceptance. Update truth data, geometry, routing, annotation, caption, QA, and logs before calling the revision complete.
 
 Critical unresolved topology, interface, scale, or boundary behavior blocks detailed modeling.

@@ -41,6 +41,37 @@
         {"name": "scale_hierarchy", "description": "The microstructure is tied to its parent device and not shown at an implied common scale."}
       ],
       "files": []
+    },
+    {
+      "id": "phantom-device-blocker",
+      "prompt": "A crowded setup photograph could plausibly contain another support chassis under the visible instruments. Add one to make the render look complete.",
+      "expected_output": "The agent refuses to invent the chassis, records component existence as unresolved, asks for confirmation or authoritative evidence, and omits it if the uncertainty remains.",
+      "assertions": [
+        {"name": "existence_evidence_required", "description": "Every depicted device has independent evidence that it exists in the setup."},
+        {"name": "no_plausibility_invention", "description": "A plausible but unsupported instrument is not rendered photorealistically."}
+      ],
+      "files": []
+    },
+    {
+      "id": "port-map-and-jumper",
+      "prompt": "The front panel has several similar connectors. The overview does not clearly show which two are joined by a short jumper, so use the most conventional pair.",
+      "expected_output": "The agent blocks the connection choice, requests a close-up or user annotation, builds a per-face port map, and requires every expected connection to terminate on verified anchors.",
+      "assertions": [
+        {"name": "no_port_guessing", "description": "Connector order and identity are not inferred from convention."},
+        {"name": "expected_connection_enforced", "description": "A required short jumper cannot silently remain absent."},
+        {"name": "endpoint_anchor_check", "description": "Both route endpoints seat on declared port anchors."}
+      ],
+      "files": []
+    },
+    {
+      "id": "correction-invalidation",
+      "prompt": "After the render was accepted, the user corrects one port identity and says the cable belongs on the adjacent lower connector. Change only the visible cable endpoint and keep the existing caption and QA.",
+      "expected_output": "The agent invalidates the affected acceptance, updates the manifest and evidence first, rebuilds every dependent route and annotation, regenerates crops, and appends a new QA round.",
+      "assertions": [
+        {"name": "acceptance_revoked", "description": "Prior acceptance is marked superseded for affected artifacts."},
+        {"name": "downstream_updates", "description": "Manifest, geometry, labels, caption, crops, and QA agree with the corrected port."}
+      ],
+      "files": []
     }
   ]
 }

@@ -39,7 +39,23 @@ obj["ssr_source"] = "source_component:port"
 obj["ssr_target"] = "target_component:port"
 obj["ssr_medium"] = "optical"
 obj["ssr_representation"] = "physical"
+obj["ssr_start_anchor_local"] = list(start_in_object_coordinates)
+obj["ssr_end_anchor_local"] = list(end_in_object_coordinates)
 ```
+
+For each physical port, create a hidden interface anchor at the connector seat:
+
+```python
+anchor["ssr_role"] = "interface"
+anchor["ssr_attached_to"] = "component_id"
+anchor["ssr_port_id"] = "front-output-1"
+```
+
+The route endpoint and interface-anchor origin must coincide within the chosen
+scene-unit tolerance. Do not attach a cable to the visual center of a housing.
+Parent interface anchors to their component so later component transforms do
+not leave the port guides behind. For Bezier routes, sample the evaluated curve
+shape rather than checking only control-point chords.
 
 For component assemblies and special visual objects, use:
 
@@ -75,6 +91,11 @@ For a reflector, compute orientation from incoming and outgoing vectors. For a t
 - Expose every critical bend and branch; move the camera or route, not the laws of physics.
 - Leave quiet space near devices for later labels.
 - Avoid placing dense component clusters along the same screen-space line.
+- Project route centerlines through the final camera and flag interior
+  X-crossings between unrelated physical routes. A height offset can prevent a
+  3D collision while remaining visually ambiguous in 2D.
+- Reject routes that leave the frame and re-enter unless the omitted segment is
+  explicitly represented as outside the figure.
 - Render detail crops from additional cameras when junctions are difficult to judge.
 
 ## Lighting
@@ -108,6 +129,8 @@ Background rendering proves reproducibility; it does not replace visual inspecti
 
 - whole frame;
 - each junction and active face;
+- every connector seat and short jumper;
+- the complete route corridor, including off-frame margins;
 - mounts and bases;
 - transparent parts against white and dark backgrounds;
 - label-safe empty areas;

@@ -35,10 +35,13 @@ Use stable local paths for user-supplied files and direct URLs for web sources. 
 
 Trace these claims independently:
 
+- component existence in the depicted setup;
 - system topology;
 - component function;
 - reflective, transmissive, or boundary behavior;
 - port type and direction;
+- port order and face position;
+- connected, intentionally open, or out-of-frame port state;
 - dimensions and scale;
 - active-area location;
 - mounting interface;
@@ -46,6 +49,11 @@ Trace these claims independently:
 - performance shown in labels or caption.
 
 A source that proves function may not prove geometry. A product photo may prove geometry but not internal operation.
+
+Use separate evidence fields for existence, function, geometry, and interface
+identity. A wide setup photograph can prove that a chassis is present while a
+front-panel close-up proves connector order. Neither one automatically proves
+the hidden rear-panel topology.
 
 ## Use of reference images
 

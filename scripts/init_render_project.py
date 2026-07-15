@@ -130,6 +130,10 @@ def main() -> int:
     if copy_new(ASSETS_DIR / "annotation_overlay.template.svg", overlay_path):
         created.append(overlay_path)
 
+    regions_path = output_dir / "qa" / "qa_regions.json"
+    if copy_new(ASSETS_DIR / "qa_regions.template.json", regions_path):
+        created.append(regions_path)
+
     ledger_path = output_dir / "references" / "source_ledger.csv"
     if not ledger_path.exists():
         with ledger_path.open("w", encoding="utf-8", newline="") as handle:
@@ -179,11 +183,15 @@ def main() -> int:
 ## Status
 
 - [ ] Evidence ledger completed
+- [ ] Component existence inventory locked
+- [ ] Per-face port identity map locked
+- [ ] Every declared port has an evidenced connection state
 - [ ] Scene manifest validated
 - [ ] Engineering storyboard approved
 - [ ] Gray-box scene inspected
 - [ ] Component fidelity inspected
 - [ ] Physical paths inspected
+- [ ] Endpoint, junction, support, and route crops inspected
 - [ ] No-text master rendered
 - [ ] Editable annotation layer completed
 - [ ] QA accepted
@@ -216,6 +224,14 @@ Record important assumptions, model changes, render settings, accepted results, 
 - Issues:
 - Corrections made:
 - Remaining uncertainty:
+
+## Correction Invalidation
+
+- User correction received:
+- Affected manifest fields:
+- Affected geometry/routes/labels:
+- Re-rendered artifacts:
+- Re-run QA evidence:
 """
     qa_path = output_dir / "qa" / "qa_log.md"
     if write_new(qa_path, qa_log):
@@ -224,7 +240,15 @@ Record important assumptions, model changes, render settings, accepted results, 
     print(f"initialized: {output_dir}")
     for path in created:
         print(f"created: {path.relative_to(output_dir)}")
-    skipped = 5 - len([p for p in created if p.name in {"scene_manifest.json", "build_scene.py", "system_annotated.svg", "WORKLOG.md", "qa_log.md"}])
+    tracked_starters = {
+        "scene_manifest.json",
+        "build_scene.py",
+        "system_annotated.svg",
+        "qa_regions.json",
+        "WORKLOG.md",
+        "qa_log.md",
+    }
+    skipped = len(tracked_starters) - len([p for p in created if p.name in tracked_starters])
     if args.force and skipped:
         print("existing files were preserved")
     return 0

@@ -104,7 +104,7 @@ def tube_between(
     obj.name = name
     obj.data.materials.append(mat)
     set_between(obj, start, end)
-    return tag(
+    tagged = tag(
         obj,
         "connection",
         source=source,
@@ -112,6 +112,25 @@ def tube_between(
         medium=medium,
         representation=representation,
     )
+    tagged["ssr_start_anchor_local"] = [0.0, 0.0, -direction.length * 0.5]
+    tagged["ssr_end_anchor_local"] = [0.0, 0.0, direction.length * 0.5]
+    return tagged
+
+
+def interface_anchor(
+    component_id: str,
+    port_id: str,
+    location: Vector,
+    parent: bpy.types.Object,
+) -> bpy.types.Object:
+    obj = bpy.data.objects.new(f"{component_id}:{port_id} interface", None)
+    bpy.context.scene.collection.objects.link(obj)
+    obj.parent = parent
+    obj.location = parent.matrix_world.inverted() @ location
+    obj.empty_display_type = "SPHERE"
+    obj.empty_display_size = 0.05
+    obj.hide_render = True
+    return tag(obj, "interface", attached_to=component_id, port_id=port_id)
 
 
 def support(
@@ -190,6 +209,8 @@ def build_system() -> None:
 
     start = source_point + Vector((0.38, 0.0, 0.0))
     end = sink_point - Vector((0.38, 0.0, 0.0))
+    interface_anchor("source", "out", start, source)
+    interface_anchor("sink", "in", end, sink)
     tube_between(
         "source-to-sink connection",
         start,

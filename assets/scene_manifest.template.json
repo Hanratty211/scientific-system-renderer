@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2",
+  "schema_version": "1.3",
   "title": "Scientific system render",
   "domain": "general",
   "truth_level": "topology-faithful",
@@ -54,6 +54,12 @@
             "generic"
           ],
           "face": "front",
+          "face_position": "front-center",
+          "evidence": [
+            "S1"
+          ],
+          "identity_confidence": "schematic",
+          "connection_expectation": "connected",
           "allows_multiple": false
         }
       ],
@@ -72,7 +78,11 @@
       "evidence": [
         "S1"
       ],
-      "confidence": "schematic"
+      "confidence": "schematic",
+      "existence_status": "schematic-placeholder",
+      "existence_evidence": [
+        "S1"
+      ]
     },
     {
       "id": "sink",
@@ -94,6 +104,12 @@
             "generic"
           ],
           "face": "front",
+          "face_position": "front-center",
+          "evidence": [
+            "S1"
+          ],
+          "identity_confidence": "schematic",
+          "connection_expectation": "connected",
           "allows_multiple": false
         }
       ],
@@ -112,7 +128,11 @@
       "evidence": [
         "S1"
       ],
-      "confidence": "schematic"
+      "confidence": "schematic",
+      "existence_status": "schematic-placeholder",
+      "existence_evidence": [
+        "S1"
+      ]
     }
   ],
   "connections": [
@@ -165,6 +185,8 @@
     }
   ],
   "acceptance_criteria": [
+    "Every depicted component has explicit existence evidence",
+    "Every port has an evidenced identity, face position, and connection expectation",
     "Every path starts and ends at a declared port",
     "No path crosses opaque or unrelated geometry",
     "Every elevated component is attached to a support",

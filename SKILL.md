@@ -9,9 +9,6 @@ description: >-
   systems. Also use to audit or repair impossible paths, wrong ports or
   orientations, collisions, floating supports, misleading scale, temporal
   states shown as simultaneous hardware, or ambiguous labels.
-metadata:
-  version: "1.2.0"
-  author: "Community contribution"
 ---
 
 # Scientific System Renderer - Router
@@ -54,6 +51,18 @@ transparency, exact scale, or internal behavior from visual resemblance alone.
 Read [evidence-and-provenance.md](references/evidence-and-provenance.md) when
 copyright, product fidelity, citations, or source tracing matters.
 
+Before geometry, lock two inventories:
+
+- component existence: every shown device must be user-confirmed, visible in a
+  supplied source, supported by an authoritative source, or visibly schematic;
+- interface identity: every shown port needs a stable ID, face position,
+  direction, medium, evidence, and expected connection state.
+
+An overview photograph can establish context but does not override a close-up
+for port order or connector identity. Read
+[interface-and-route-qa.md](references/interface-and-route-qa.md) for physical
+setups and repair tasks.
+
 ### 4. Resolve uncertainty before modeling
 
 Treat every uncertain factual detail as blocked, not as permission to
@@ -91,6 +100,10 @@ Complete `scene_manifest.json` before detailed modeling. Declare components,
 ports, active faces, opacity, capabilities, scale, parent assemblies, supports,
 states, contacts, routes, loops, motions, and evidence. Model each relationship
 as physical, field, logical, temporal, contact, containment, or motion envelope.
+Schema `1.3` also requires component-existence evidence and an explicit
+`connection_expectation` for every port. A port expected to be connected is a
+validation error when unused. An intentionally open or out-of-frame port needs
+a reason and evidence.
 
 Validate it:
 
@@ -114,6 +127,10 @@ sink order, port directions, branch-causing components, path width changes,
 supports, clearances, state reuse, and camera visibility. Every bend, split,
 merge, conversion, focus, resize, or switch must have a physical cause.
 
+Freeze a port-to-port table before cable, tube, beam, or fiber routing. Never
+route to a housing center when the destination is a connector. Never infer a
+hidden jumper or termination from convention.
+
 Load [physical-plausibility.md](references/physical-plausibility.md) for
 domain-specific rules. For optical benches, also load
 [optical-bench-failure-patterns.md](references/optical-bench-failure-patterns.md).
@@ -132,6 +149,11 @@ Where practical, assign these object properties:
 - support: `ssr_role=support`, `ssr_supports`;
 - annotation: `ssr_role=annotation`.
 
+Represent each physical port as an interface anchor tagged with
+`ssr_attached_to` and `ssr_port_id`. Give each route auditable
+`ssr_start_anchor` and `ssr_end_anchor` coordinates or build it as a curve whose
+endpoints coincide with the anchors.
+
 ### 8. Audit, render, and inspect
 
 Audit a saved scene:
@@ -139,7 +161,7 @@ Audit a saved scene:
 ```bash
 blender --background final/system.blend \
   --python "$SKILL_DIR/scripts/audit_blender_scene.py" -- \
-  --output qa/blender_scene_audit.json
+  --output qa/blender_scene_audit.json --strict-endpoints
 ```
 
 Render a transparent no-text master and inspect it on a neutral white
@@ -155,6 +177,18 @@ python3 "$SKILL_DIR/scripts/render_qa.py" final/system.png \
 Inspect the whole frame and close crops of every junction, port cluster,
 support, reflector, branch device, and endpoint. Record at least one rejected
 round and one corrected round for a complex figure. Never pre-write acceptance.
+
+Generate deterministic crops from normalized review regions:
+
+```bash
+python3 "$SKILL_DIR/scripts/generate_detail_crops.py" \
+  final/system_no_text.png qa/qa_regions.json qa/crops \
+  --contact-sheet qa/detail_contact_sheet.png --report qa/detail_crops.md
+```
+
+Three-dimensional separation does not excuse an ambiguous X-crossing in the
+final camera projection. Move the route or camera, or show a documented bridge
+or junction.
 
 ### 9. Annotate and package
 
@@ -193,6 +227,9 @@ validator tests, not visual templates and not evidence for a user project.
 Do not call a complex figure complete unless:
 
 - every path starts and ends at a declared interface;
+- every shown component has explicit existence evidence;
+- every port has a verified or explicitly schematic identity and an evidenced
+  connected/open/out-of-frame state;
 - every factual uncertainty was user-confirmed, authoritatively resolved,
   intentionally omitted, or explicitly left as an unresolved schematic;
 - every turn, branch, merge, conversion, and width change has a valid cause;
@@ -206,3 +243,8 @@ Do not call a complex figure complete unless:
 - labels remain editable and unambiguous;
 - sources, assumptions, QA rounds, regeneration commands, and outputs are
   recorded.
+
+Any user correction to component identity, port order, topology, or operating
+state invalidates prior acceptance for all dependent geometry, routes, labels,
+captions, and QA. Update the manifest first, rebuild downstream artifacts, and
+record the new review evidence.
