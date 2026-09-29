@@ -188,6 +188,10 @@ corrections; a genuine first-pass success is allowed. Never manufacture a
 rejected round or pre-write acceptance. Keep agent self-review separate from
 user acceptance.
 
+Check part-to-part fit and material character separately from route audits.
+Connection-free views can still contain intersecting packages, detached joints
+or a soft material rendered as rigid hardware; record these as visual findings.
+
 The scene audit returns PASS, FAIL or UNVERIFIED with coverage counts. Zero
 audited components or missing route data cannot pass. Component-only views may
 use `--scope component-sheet`; physical setups must not use that option to hide

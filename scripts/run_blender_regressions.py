@@ -173,6 +173,20 @@ def main():
             bpy.context.scene.objects[name].location.y += 1
         route.location.y += 1
 
+    def transparency_slots(route, use_opaque=False):
+        obj = box("transparent surface", (0, 2, 0), (.3, .3, .3))
+        obj["ssr_opacity"] = "transparent"
+        glass = bpy.data.materials.new("regression glass")
+        glass.use_nodes = True
+        glass.node_tree.nodes.get("Principled BSDF").inputs["Transmission Weight"].default_value = 1
+        opaque = bpy.data.materials.new("unused opaque")
+        opaque.use_nodes = True
+        obj.data.materials.append(glass)
+        obj.data.materials.append(opaque)
+        obj.data.materials.append(None)
+        if use_opaque:
+            obj.data.polygons[0].material_index = 1
+
     cases = [("valid", lambda r: None, "PASS", None),
              ("untagged", empty, "UNVERIFIED", None),
              ("detached", detach, "FAIL", "B051"),
@@ -191,7 +205,9 @@ def main():
              ("instanced-text", instance_text, "FAIL", "B060"),
              ("unknown-role", lambda r: box("unknown", (0, 0, 0), (.2, .2, .2), "componnet"), "UNVERIFIED", "B020"),
              ("opacity-mismatch", opacity, "FAIL", "B070"),
-             ("floating-anchors", anchors_float, "UNVERIFIED", "B037")]
+             ("floating-anchors", anchors_float, "UNVERIFIED", "B037"),
+             ("unused-material-slots", transparency_slots, "PASS", None),
+             ("used-opaque-material", lambda r: transparency_slots(r, True), "UNVERIFIED", None)]
     with tempfile.TemporaryDirectory(prefix="ssr-scenes-") as temporary:
         results = [run_case(*case, Path(temporary)) for case in cases]
     args.output.parent.mkdir(parents=True, exist_ok=True)

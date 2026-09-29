@@ -34,7 +34,7 @@ proof; visual self-review and user acceptance remain separate. See
 [Geometry validation](references/geometry-validation.md).
 
 Unsupported NURBS, modifiers, multiple splines, variable radii, mesh proxies
-and instances are not counted as completed route checks. The 19 original
+and instances are not counted as completed route checks. The 21 original
 Blender regressions test tool behavior, not acceptance of paper-based figures.
 
 ## Hard Gates

@@ -33,7 +33,8 @@ Component counts require visible evaluated geometry, not just tagged empties.
 Unknown roles are uncovered. Collection instances are disclosed as spatially
 unverified until their transformed geometry is supported. Viewport-disabled
 but render-enabled geometry likewise needs review. Simple transmission/alpha
-materials are compared with opacity declarations; complex shaders need manual
+materials actually used by evaluated faces are compared with opacity declarations;
+unused material slots do not imply opaque faces. Complex shaders need manual
 review. Transparent solids still block cables and tubes. Optical transmission
 through them is a separate, explicitly unverified domain question.
 
@@ -47,6 +48,14 @@ additional sampling, intersection tests or close inspection. Open meshes have
 surface checks only. Projected body bounds yield conservative review candidates,
 not confirmed collisions. Inspect full beam/cable width against support outlines.
 
+This is not a general part-to-part clash detector. Even a connection-free scene
+can contain overlapping chip packages, detached spring ends or floating layers.
+Inspect those assemblies separately, using explicit mating/contact constraints
+or focused distance tests where possible. Never report a route-only PASS as
+proof that all parts fit. Match material character to the photographed object:
+a foil pouch should not silently become a machined enclosure, and visual
+roughness should not imply a measured pore lattice.
+
 ## Reflectors (Optical Tasks Only)
 
 Mark the actual reflecting object with `ssr_reflector=True`, plus
@@ -59,13 +68,15 @@ does not simulate diffraction or validate a complete optical instrument.
 
 ## Executable Regressions
 
-Run `blender --background --python-exit-code 1 --python
+Run `blender --background --factory-startup --python-exit-code 1 --python
 scripts/run_blender_regressions.py -- --output /tmp/renderer-regressions.json`.
 Cases are original generated scenes, not publisher figures. They test empty
 coverage, endpoint detachment, endpoint-body intrusion, finite-width intrusion,
 enclosed routes, projected support ambiguity, wrong mirror orientation and
 no-text enforcement, collection visibility, instanced text, missing geometry,
-invalid roles, unsupported splines/modifiers/tapers and opacity mismatch.
+invalid roles, unsupported splines/modifiers/tapers, opacity mismatch and used
+versus unused material slots. Factory startup avoids localization and user-file
+state affecting reproducibility; the explicit Python exit code exposes failures.
 A test pass does not prove arbitrary domain competence.
 
 For paper-based evaluations, keep article URLs, figure/panel IDs, source rights,

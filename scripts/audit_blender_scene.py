@@ -424,7 +424,7 @@ def main() -> int:
             if cid in components:
                 visible_components.add(cid)
             opacity = str(obj.get("ssr_opacity", "opaque"))
-            if opacity != "opaque" and not transparent_material_supported(obj):
+            if opacity != "opaque" and not transparent_material_supported(obj, depsgraph):
                 unverified.append(f"{obj.name}: opacity metadata is not supported by a simple transparent material")
             # A clear solid still blocks a cable/tube. Optical pass-through needs domain evidence.
             if opacity != "opaque" and any(str(c.get("ssr_medium", "")) == "optical" for c in physical_connections):

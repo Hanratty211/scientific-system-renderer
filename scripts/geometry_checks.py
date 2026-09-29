@@ -120,11 +120,20 @@ def render_inventory(scene, view_layer):
     return list(objects.values()), instances, text_objects, limitations
 
 
-def transparent_material_supported(obj):
+def transparent_material_supported(obj, depsgraph=None):
     """Only recognize simple transmission/alpha declarations; no shader proof."""
-    if not obj.data.materials:
+    evaluated = obj.evaluated_get(depsgraph) if depsgraph else obj
+    mesh = evaluated.to_mesh()
+    if mesh is None:
         return False
-    for material in obj.data.materials:
+    try:
+        used = {polygon.material_index for polygon in mesh.polygons}
+        materials = [mesh.materials[index] if index < len(mesh.materials) else None for index in used]
+    finally:
+        evaluated.to_mesh_clear()
+    if not materials:
+        return False
+    for material in materials:
         if not material or not material.use_nodes:
             return False
         nodes = [n for n in material.node_tree.nodes if n.type == "BSDF_PRINCIPLED"]
