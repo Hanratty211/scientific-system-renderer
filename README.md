@@ -1,7 +1,7 @@
 # Scientific System Renderer
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
-[![Skill version](https://img.shields.io/badge/skill-v1.4.0-0b7285.svg)](manifest.yaml)
+[![Skill version](https://img.shields.io/badge/skill-v1.4.1-0b7285.svg)](manifest.yaml)
 [English](README_EN.md)
 
 面向 Codex、Claude Code 等 Agent 的科研系统渲染 Skill。它把实物照片、
@@ -19,6 +19,22 @@
 - 高分辨率透明无文字底图与可编辑 SVG 标注；
 - 修复光路/线缆穿模、器件悬空、端口接错、比例失真和时序误画；
 - 对已有 Blender 工程做物理、接口、构图和交付审计。
+
+## v1.4.1 范围防降级
+
+整体架构请求不能用器件特写、器件拼盘或互不相连的模型替代。建模前锁定
+系统边界、输入/激励、核心装置、必要控制支路与输出；用独立交付合同保留
+这些要求。证据只支持器件时，应更换验证案例或提问，不能缩小任务范围。
+
+```bash
+python3 scripts/validate_delivery_scope.py delivery_contract.json scene_manifest.json
+python3 scripts/test_delivery_scope.py
+```
+
+该检查核对声明的视图、必要节点、关系类型和完整路径，不证明实际画面
+可见、端口正确或科学依据充分。器件模型可作为素材，但不计为整体架构验收。
+所有请求视图均须交付；电源与控制等并行支路逐条匹配，不能共用一条连接
+抵数。当前范围回归 20 项通过，另有 22 个独立构造的输入探针通过修复后重测。
 
 ## v1.4 新增检查
 
@@ -71,6 +87,7 @@
 
 | 失败模式 | 原因 | 新的防线 |
 |---|---|---|
+| 整体架构变成单一器件图 | 先挑容易建模的局部照片，遗漏系统范围 | 独立请求合同 + system scope gate |
 | 凭总览补出并不存在的机箱 | 把“合理”当成“存在” | component existence gate |
 | 端口数量对但身份和上下顺序错 | 没有逐面 port map | schema 1.3 port evidence |
 | 漏掉短跳线，端口空着也通过 | 未连接仅是 warning | `connection_expectation` 硬错误 |

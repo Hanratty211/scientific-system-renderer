@@ -41,6 +41,16 @@ Use more than one route only when the requested deliverables genuinely require
 separate views. Do not overload a physical setup with logical architecture,
 temporal states, and dense explanatory prose.
 
+Preserve the user's requested scope. A system architecture request cannot be
+silently reduced to `component_sheet`, even if that is easier to source or model.
+First declare the system boundary, one operating configuration, its input or
+excitation, core apparatus, necessary control branches, and output/readout.
+Record these as required components and evidenced relationships in the delivery
+contract. Do not invent extra instruments to fill those roles: a mechanical
+output can be the endpoint. If a paper supports only a device view, replace the
+case or ask about the missing evidence; do not count it as a system validation.
+Component renders are assets or supplementary views, not substitutes.
+
 ### 3. Read project governance and evidence
 
 Inspect repository instructions, task logs, output conventions, and Git status.
@@ -191,6 +201,20 @@ user acceptance.
 Check part-to-part fit and material character separately from route audits.
 Connection-free views can still contain intersecting packages, detached joints
 or a soft material rendered as rigid hardware; record these as visual findings.
+
+Before acceptance, run `scripts/validate_delivery_scope.py` with the original
+delivery contract and scene manifest. Match required nodes and relationships
+against what the delivered view actually shows, then visually trace the complete
+input-to-output path. A scope pass is only a manifest check, not proof that the
+rendered geometry, evidence or visibility is correct. Never change the request
+contract merely to make this gate pass.
+
+Request view names must be lists, not strings. The scope gate requires every
+requested view type and preserves distinct parallel relationships. A required
+relationship uses `source`, `target` (component IDs), and `representation`;
+optional `id`, `medium`, `source_port`, and `target_port` constraints must match
+the delivered connection. Include all required branch endpoints in
+`required_components`; a self-loop is not an input-to-output path.
 
 The scene audit returns PASS, FAIL or UNVERIFIED with coverage counts. Zero
 audited components or missing route data cannot pass. Component-only views may

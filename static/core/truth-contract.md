@@ -18,5 +18,6 @@ Before modeling, establish a machine-readable truth model for the figure.
 14. Declare every port as connected, intentionally open, or outside the figure. An expected connection that is absent is an error; an open port without an evidenced reason is also an error.
 15. Seat every physical route on declared endpoint anchors. Check the complete route in world space and in final camera projection; avoid unexplained X-crossings, off-frame detours, and hidden re-entry.
 16. A user correction invalidates all dependent prior acceptance. Update truth data, geometry, routing, annotation, caption, QA, and logs before calling the revision complete.
+17. Preserve requested system scope independently of the delivered view. A detailed device, a disconnected equipment collection, or a count of objects cannot stand in for a complete, evidenced system architecture. Declare and check the required functional path and control branches before visual acceptance.
 
 Critical unresolved topology, interface, scale, or boundary behavior blocks detailed modeling.

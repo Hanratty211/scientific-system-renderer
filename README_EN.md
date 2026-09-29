@@ -1,7 +1,7 @@
 # Scientific System Renderer
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
-[![Skill version](https://img.shields.io/badge/skill-v1.4.0-0b7285.svg)](manifest.yaml)
+[![Skill version](https://img.shields.io/badge/skill-v1.4.1-0b7285.svg)](manifest.yaml)
 [中文说明](README.md)
 
 An agent-operated skill for Codex, Claude Code, and other tool-using agents.
@@ -23,6 +23,25 @@ time states.
   mechanism insets;
 - high-resolution transparent no-text masters plus editable SVG annotation;
 - auditing or repairing Blender scenes with interface and physical-layout risk.
+
+## Scope Preservation in v1.4.1
+
+A complete-system request must not be silently reduced to a component sheet or
+disconnected equipment collection. Lock the boundary, excitation/input, core
+apparatus, necessary controls, and output in a separate request contract before
+modeling. Replace device-only paper cases or ask for missing evidence rather
+than shrinking the task. Component models are assets, not system validations.
+
+```bash
+python3 scripts/validate_delivery_scope.py delivery_contract.json scene_manifest.json
+python3 scripts/test_delivery_scope.py
+```
+
+This gate checks declared views, required nodes, relationship classes and paths.
+It does not prove rendered visibility, port correctness or scientific evidence.
+Every requested view is required; distinct parallel branches cannot share one
+delivered connection. The scope suite has 20 passing tests, with 22 independently
+constructed input probes also passing after fixes.
 
 ## New in v1.4
 

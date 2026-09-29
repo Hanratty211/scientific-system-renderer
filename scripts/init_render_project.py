@@ -134,6 +134,10 @@ def main() -> int:
         created.append(overlay_path)
 
     contract = {"annotations": args.annotations, "background": "transparent", "min_width": 3000,
+                "requested_views": requested_views,
+                "system_boundary": "unresolved",
+                "required_components": [], "required_relationships": [],
+                "required_paths": [],
                 "views": requested_views, "simplification_permission": "unresolved",
                 "revision_scope": "new project", "user_acceptance": "pending"}
     write_new(output_dir / "delivery_contract.json", json.dumps(contract, indent=2) + "\n")
