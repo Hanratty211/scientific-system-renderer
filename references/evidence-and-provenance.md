@@ -72,7 +72,31 @@ Treat a journal figure as evidence only for the claims it actually supports. A s
 
 The built-in regression fixtures are original synthetic test definitions. They are not evidence for a user project and must never be cited as support for a real component, topology, or physical claim.
 
-## Uncertainty
+## Parameter and Texture Evidence
+
+Before repeating geometry or fixing proportions, extract a short parameter
+ledger from the caption and relevant methods: semantic unit count, pitch,
+diameter, thickness, gap, active area and operating state. Record each value's
+source location and whether it is measured, specified, visually estimated or
+intentionally schematic. A visible strip, chamber wall or repeated surface mark
+is not necessarily one functional unit. Do not choose an attractive array count
+when the paper specifies the count elsewhere.
+
+Use real cavities, contacts and supports for structural features. Use material
+roughness for unresolved surface texture; decorative perforations or repeated
+cells must not masquerade as measured microstructure. If a fine detail cannot be
+resolved, omit it or disclose a representative display density without claiming
+it as the actual count. Never combine alternative connection states into one
+physical object.
+
+For a paper evaluation, pair each render with the exact source panel, confirmed
+facts, omitted unknowns and audit scope. A component-only study cannot validate
+the omitted bench connections. Report those zero-coverage areas prominently;
+do not aggregate scoped passes into a claim of complete system reconstruction.
+Reference retrieval must identify figure numbers/IDs explicitly: article pages
+may mix tables with figures, so list position is not a reliable figure number.
+
+## Detail Confidence
 
 Classify important details as:
 

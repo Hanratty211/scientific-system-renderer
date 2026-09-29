@@ -47,6 +47,9 @@ Inspect repository instructions, task logs, output conventions, and Git status.
 Build a source ledger from user-provided files and authoritative sources. Treat
 reference figures as evidence, not reusable artwork. Never infer hidden ports,
 transparency, exact scale, or internal behavior from visual resemblance alone.
+Extract caption/method parameters before choosing repeated unit counts, gaps or
+active-area dimensions. Distinguish structural geometry from illustrative
+surface texture; keep source values separate from visual estimates.
 
 Read [evidence-and-provenance.md](references/evidence-and-provenance.md) when
 copyright, product fidelity, citations, or source tracing matters.
