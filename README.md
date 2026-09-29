@@ -1,7 +1,7 @@
 # Scientific System Renderer
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
-[![Skill version](https://img.shields.io/badge/skill-v1.3.0-0b7285.svg)](manifest.yaml)
+[![Skill version](https://img.shields.io/badge/skill-v1.4.0-0b7285.svg)](manifest.yaml)
 [English](README_EN.md)
 
 面向 Codex、Claude Code 等 Agent 的科研系统渲染 Skill。它把实物照片、
@@ -20,7 +20,21 @@
 - 修复光路/线缆穿模、器件悬空、端口接错、比例失真和时序误画；
 - 对已有 Blender 工程做物理、接口、构图和交付审计。
 
-## v1.3 的关键约束
+## v1.4 新增检查
+
+- 输出 PASS / FAIL / UNVERIFIED 及覆盖率，未检查的场景不能冒充通过。
+- 对实际几何执行有限宽度采样检查，包含连接两端的器件；只允许接口局部接触。
+- 增加镜面方向、斜入射光斑和路径对支架的投影歧义检查。
+- QA 绑定场景/图片 SHA256；用户验收与 Agent 自检分开记录。
+- 无标注交付不生成标注文件；只记录真实发生的检查和返工。
+- 新增 Blender 场景回归与安装路径检查，见 [几何验证](references/geometry-validation.md)。
+
+几何采样不是连续体积碰撞证明，投影包围盒只产生待核对候选；仍需逐图目检。
+自动路径碰撞检查仅覆盖受支持的单条、等半径圆截面曲线。NURBS、修改器、
+多段样条、变半径、网格代理和实例化几何不会被误算为已完成检查。
+仓库包含 19 个原创 Blender 回归场景；它们验证工具行为，不代表论文案例已验收。
+
+## 核心约束
 
 ### 1. 器件存在性单独取证
 

@@ -88,12 +88,17 @@ only when they do not imply a scientific or hardware fact.
 
 ### 5. Initialize and validate the truth model
 
+Lock a delivery contract first: requested views, annotation mode, background,
+pixel dimensions, editable formats, simplification permission and revision
+scope. A no-text request excludes annotation generation. Separate inherited
+geometry from newly verified geometry; a local repair is not full-system approval.
+
 For a new package, run:
 
 ```bash
 python3 "$SKILL_DIR/scripts/init_render_project.py" OUTPUT_DIR \
   --title "System title" --domain general \
-  --views architecture,physical-setup,component-sheet
+  --views physical-setup --annotations none
 ```
 
 Complete `scene_manifest.json` before detailed modeling. Declare components,
@@ -175,8 +180,17 @@ python3 "$SKILL_DIR/scripts/render_qa.py" final/system.png \
 ```
 
 Inspect the whole frame and close crops of every junction, port cluster,
-support, reflector, branch device, and endpoint. Record at least one rejected
-round and one corrected round for a complex figure. Never pre-write acceptance.
+support, reflector, branch device, and endpoint. Record actual findings and
+corrections; a genuine first-pass success is allowed. Never manufacture a
+rejected round or pre-write acceptance. Keep agent self-review separate from
+user acceptance.
+
+The scene audit returns PASS, FAIL or UNVERIFIED with coverage counts. Zero
+audited components or missing route data cannot pass. Component-only views may
+use `--scope component-sheet`; physical setups must not use that option to hide
+missing routes. Use `--no-text` when requested. See
+[geometry-validation.md](references/geometry-validation.md) for radius, contact
+and reflection metadata, limitations and executable scene regressions.
 
 Generate deterministic crops from normalized review regions:
 
@@ -192,12 +206,14 @@ or junction.
 
 ### 9. Annotate and package
 
-Add labels only after geometry and paths pass QA. Keep text horizontal,
+Only generate annotations when the delivery contract requests them.
+Add labels after geometry and paths pass QA. Keep text horizontal,
 editable, concise, and directly associated with its target. Use an SVG overlay
 for labels, arrows, equations, and compact mechanism panels. Load
 [visual-and-delivery.md](references/visual-and-delivery.md) before export.
 
-The default complete package is:
+An annotated package can contain the following; omit annotation files for a
+no-text contract:
 
 ```text
 final/
@@ -240,7 +256,7 @@ Do not call a complex figure complete unless:
 - fields, logical links, contact, transport paths, and motion envelopes use
   distinct visual grammars;
 - the no-text render passes whole-frame and close-crop inspection;
-- labels remain editable and unambiguous;
+- labels, when requested, remain editable and unambiguous;
 - sources, assumptions, QA rounds, regeneration commands, and outputs are
   recorded.
 

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import re
@@ -140,8 +141,10 @@ def main() -> int:
             "# Detail Crop QA Index",
             "",
             f"- Source: `{args.image}`",
+            f"- Source SHA256: `{hashlib.sha256(args.image.read_bytes()).hexdigest()}`",
             f"- Regions: `{len(results)}`",
-            f"- Result: `{'FAIL' if failed else 'PASS'}`",
+            f"- Crop generation: `{'FAIL' if failed else 'PASS'}`",
+            "- Visual review: `PENDING` (generation does not inspect or accept the crops)",
             "",
             "| Region | Purpose | Pixel box | Crop | Required |",
             "|---|---|---|---|---:|",

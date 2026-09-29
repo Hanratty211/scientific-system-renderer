@@ -114,6 +114,7 @@ def tube_between(
     )
     tagged["ssr_start_anchor_local"] = [0.0, 0.0, -direction.length * 0.5]
     tagged["ssr_end_anchor_local"] = [0.0, 0.0, direction.length * 0.5]
+    tagged["ssr_radius"] = radius
     return tagged
 
 

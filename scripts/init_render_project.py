@@ -53,6 +53,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("output_dir", type=Path)
     parser.add_argument("--title", required=True)
     parser.add_argument("--domain", default="general")
+    parser.add_argument("--annotations", choices=("none", "svg"), default="none")
     parser.add_argument(
         "--views",
         default="physical-setup",
@@ -106,6 +107,8 @@ def main() -> int:
         manifest = json.loads((ASSETS_DIR / "scene_manifest.template.json").read_text(encoding="utf-8"))
         manifest["title"] = args.title
         manifest["domain"] = args.domain
+        if args.annotations == "none":
+            manifest["deliverables"] = [item for item in manifest["deliverables"] if "_annotated" not in item]
         manifest["views"] = [
             {
                 "id": view,
@@ -127,8 +130,13 @@ def main() -> int:
         created.append(build_path)
 
     overlay_path = output_dir / "final" / "system_annotated.svg"
-    if copy_new(ASSETS_DIR / "annotation_overlay.template.svg", overlay_path):
+    if args.annotations == "svg" and copy_new(ASSETS_DIR / "annotation_overlay.template.svg", overlay_path):
         created.append(overlay_path)
+
+    contract = {"annotations": args.annotations, "background": "transparent", "min_width": 3000,
+                "views": requested_views, "simplification_permission": "unresolved",
+                "revision_scope": "new project", "user_acceptance": "pending"}
+    write_new(output_dir / "delivery_contract.json", json.dumps(contract, indent=2) + "\n")
 
     regions_path = output_dir / "qa" / "qa_regions.json"
     if copy_new(ASSETS_DIR / "qa_regions.template.json", regions_path):
@@ -193,7 +201,7 @@ def main() -> int:
 - [ ] Physical paths inspected
 - [ ] Endpoint, junction, support, and route crops inspected
 - [ ] No-text master rendered
-- [ ] Editable annotation layer completed
+- Annotation mode: {args.annotations}; generate overlays only when requested
 - [ ] QA accepted
 
 ## Decisions and Results
@@ -215,7 +223,7 @@ Record important assumptions, model changes, render settings, accepted results, 
 - Issues:
 - Required corrections:
 
-## Round 2 - Corrected physical render
+## Subsequent Review (only if performed)
 
 - Date:
 - Artifact:

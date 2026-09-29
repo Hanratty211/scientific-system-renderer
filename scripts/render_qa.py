@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import hashlib
 import math
 import sys
 from dataclasses import asdict, dataclass
@@ -16,6 +17,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageStat
 @dataclass
 class ImageResult:
     path: str
+    sha256: str = ""
     width: int = 0
     height: int = 0
     mode: str = ""
@@ -62,6 +64,7 @@ def percentile_from_histogram(histogram: list[int], percentile: float) -> int:
 def inspect_image(path: Path, args: argparse.Namespace) -> tuple[ImageResult, Image.Image | None]:
     result = ImageResult(path=str(path))
     try:
+        result.sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
         with Image.open(path) as opened:
             image = opened.convert("RGBA")
             result.width, result.height = opened.size
@@ -193,6 +196,7 @@ def write_markdown(path: Path, results: list[ImageResult]) -> None:
                 f"## {Path(result.path).name}",
                 "",
                 f"- Size: `{result.width} x {result.height}`",
+                f"- SHA256: `{result.sha256}`",
                 f"- Mode: `{result.mode}`",
                 f"- Alpha present: `{result.has_alpha}`",
                 f"- Transparent fraction: `{result.transparent_fraction:.4f}`",
@@ -212,7 +216,7 @@ def write_markdown(path: Path, results: list[ImageResult]) -> None:
             lines.extend(f"- {message}" for message in result.warnings)
             lines.append("")
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
 
 
 def main() -> int:

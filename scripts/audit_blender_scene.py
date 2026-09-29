@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import itertools
+import hashlib
 import json
 import re
 import sys
@@ -18,6 +19,9 @@ import bpy
 from bpy_extras.object_utils import world_to_camera_view
 from mathutils import Vector
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from geometry_checks import evaluated_geometry, route_radius, sampled_collisions, projection_candidates, reflection_checks, route_limitations, render_inventory, transparent_material_supported
+
 
 def parse_args() -> argparse.Namespace:
     argv = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
@@ -27,6 +31,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--strict-endpoints", action="store_true")
     parser.add_argument("--endpoint-tolerance", type=float, default=0.04)
     parser.add_argument("--min-width", type=int, default=3000)
+    parser.add_argument("--scope", choices=("physical-setup", "component-sheet"), default="physical-setup")
+    parser.add_argument("--no-text", action="store_true")
     return parser.parse_args(argv)
 
 
@@ -79,6 +85,8 @@ def vector_property(obj: bpy.types.Object, key: str) -> Vector | None:
 
 def connection_points(obj: bpy.types.Object) -> list[Vector]:
     if obj.type == "CURVE":
+        if len(obj.data.splines) != 1 or any(s.type not in {"POLY", "BEZIER"} or s.use_cyclic_u for s in obj.data.splines):
+            return []
         points: list[Vector] = []
         for spline in obj.data.splines:
             values: list[Vector] = []
@@ -146,6 +154,11 @@ def main() -> int:
     scene = bpy.context.scene
     errors: list[dict[str, str]] = []
     warnings: list[dict[str, str]] = []
+    unverified = []
+    visible_objects, instances, visible_text, visibility_limits = render_inventory(scene, bpy.context.view_layer)
+    unverified.extend(visibility_limits)
+    if instances:
+        unverified.append("Instanced render geometry not spatially audited: " + ", ".join(instances))
 
     def finding(target: list[dict[str, str]], code: str, location: str, message: str) -> None:
         target.append({"code": code, "location": location, "message": message})
@@ -168,9 +181,12 @@ def main() -> int:
     port_anchors: dict[tuple[str, str], bpy.types.Object] = {}
     motion_envelopes: defaultdict[str, list[bpy.types.Object]] = defaultdict(list)
 
-    for obj in scene.objects:
+    valid_roles = {"component", "part", "support", "environment", "connection", "interface", "motion-envelope", "annotation"}
+    for obj in visible_objects:
+        if obj.type in {"CAMERA", "LIGHT"}:
+            continue
         role = obj.get("ssr_role")
-        if not role:
+        if role not in valid_roles:
             untagged.append(obj.name)
             continue
         roles[str(role)] += 1
@@ -223,6 +239,13 @@ def main() -> int:
         finding(errors, "B020", "scene", f"{len(untagged)} object(s) lack ssr_role metadata")
     elif untagged:
         finding(warnings, "B020", "scene", f"{len(untagged)} object(s) lack ssr_role metadata")
+    visible_untagged = [name for name in untagged if scene.objects[name].type in {"MESH", "CURVE", "FONT", "SURFACE", "META"} and not scene.objects[name].hide_render]
+    if visible_untagged:
+        unverified.append("Visible geometry lacks semantic roles")
+    if not components:
+        unverified.append("No components were audited")
+    if args.no_text and visible_text:
+        finding(errors, "B060", "scene", "visible text violates no-text delivery contract")
 
     duplicate_suffix = [obj.name for obj in scene.objects if re.search(r"\.\d{3}$", obj.name)]
     if duplicate_suffix:
@@ -267,8 +290,14 @@ def main() -> int:
         component_box = world_aabb(component)
         for interface in interface_objects:
             interface_box = world_aabb(interface)
+            if interface.type == "EMPTY":
+                point = interface.matrix_world.translation
+                interface_box = (point, point)
             if component_box and interface_box and aabb_gap(component_box, interface_box) > 0.03:
                 finding(warnings, "B037", interface.name, f"interface is detached from {attached_id}")
+                unverified.append(f"{interface.name}: housing attachment not verified")
+            elif component_box is None:
+                unverified.append(f"{interface.name}: parent has no auditable housing bounds")
 
     for moving_id in motion_envelopes:
         if moving_id not in components:
@@ -320,17 +349,23 @@ def main() -> int:
         source_key = endpoint_key(source_text)
         target_key = endpoint_key(target_text)
         points = connection_points(connection)
+        limits = route_limitations(connection)
+        unverified.extend(f"{connection.name}: {reason}" for reason in limits)
         missing_geometry = not points
-        if missing_geometry and args.strict_endpoints:
-            finding(errors, "B052", connection.name, "connection has no auditable route endpoints; tag ssr_start_anchor/ssr_end_anchor or use a curve")
+        if missing_geometry:
+            unverified.append(f"{connection.name}: no auditable route geometry")
+            if args.strict_endpoints and not limits:
+                finding(errors, "B052", connection.name, "connection has no auditable route endpoints; tag ssr_start_anchor/ssr_end_anchor or use a curve")
         for endpoint_name, key, point in (
             ("source", source_key, points[0] if points else None),
             ("target", target_key, points[-1] if points else None),
         ):
             if key is None:
+                finding(errors, "B055", connection.name, f"malformed {endpoint_name} component:port reference")
                 continue
             anchor = port_anchors.get(key)
             if anchor is None:
+                unverified.append(f"{connection.name}: missing {endpoint_name} interface anchor")
                 target = errors if args.strict_endpoints else warnings
                 finding(target, "B053", connection.name, f"{endpoint_name} has no interface anchor object for {key[0]}:{key[1]}")
                 continue
@@ -372,6 +407,62 @@ def main() -> int:
                 "physical routes form an interior X-crossing in camera projection; separate them visually or add an explicit bridge/junction",
             )
 
+    if args.scope == "physical-setup" and not physical_connections:
+        unverified.append("No physical connections were audited; use component-sheet scope only for an intentionally connection-free view")
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    solids = []
+    visible_components = set()
+    skipped_solids = []
+    for obj in visible_objects:
+        if obj.hide_render or obj.type not in {"MESH", "CURVE", "SURFACE", "FONT"}:
+            continue
+        if obj.get("ssr_role") not in {"component", "part", "support", "environment"}:
+            continue
+        geometry = evaluated_geometry(obj, depsgraph)
+        if geometry:
+            cid = str(obj.get("ssr_component_id", obj.get("ssr_parent", obj.name)))
+            if cid in components:
+                visible_components.add(cid)
+            opacity = str(obj.get("ssr_opacity", "opaque"))
+            if opacity != "opaque" and not transparent_material_supported(obj):
+                unverified.append(f"{obj.name}: opacity metadata is not supported by a simple transparent material")
+            # A clear solid still blocks a cable/tube. Optical pass-through needs domain evidence.
+            if opacity != "opaque" and any(str(c.get("ssr_medium", "")) == "optical" for c in physical_connections):
+                skipped_solids.append(obj.name)
+                unverified.append(f"{obj.name}: optical transmission/contact geometry requires domain review")
+                continue
+            solids.append((str(obj.get("ssr_component_id", obj.get("ssr_parent", obj.name))), geometry))
+    if not visible_components:
+        unverified.append("No visible component geometry was audited")
+    for cid in set(components) - visible_components:
+        unverified.append(f"{cid}: tagged component lacks visible evaluated geometry")
+    collision_findings = []
+    routes_checked = 0
+    for connection in physical_connections:
+        if route_limitations(connection):
+            continue
+        points = connection_points(connection)
+        radius = route_radius(connection)
+        if not points or radius is None:
+            unverified.append(f"{connection.name}: finite-width collision check unavailable")
+            continue
+        anchors = []
+        for key_name in ("ssr_source", "ssr_target"):
+            key = endpoint_key(str(connection.get(key_name, "")))
+            if key in port_anchors:
+                anchors.append((key[0], port_anchors[key].matrix_world.translation))
+        collision_findings.extend(sampled_collisions(connection, points, radius, solids, anchors))
+        routes_checked += 1
+        candidates = projection_candidates(scene, connection, points, radius, [s for s in solids if s[0] not in {o.name for o in scene.objects if o.get("ssr_role") == "environment"}])
+        if candidates:
+            finding(warnings, "B071", connection.name, f"finite-width route overlaps projected body bounds: {', '.join(candidates)}; visual review required")
+    for collision in collision_findings:
+        finding(errors, "B070", collision["route"], f"sampled geometry intersects {collision['solid']} at {collision['point']}")
+    reflections, reflection_errors = reflection_checks(scene)
+    for message in reflection_errors:
+        finding(errors, "B080", "reflection", message)
+    result = "FAIL" if errors else "UNVERIFIED" if unverified else "PASS"
+    scene_path = Path(bpy.data.filepath) if bpy.data.filepath else None
     report = {
         "scene": bpy.data.filepath,
         "engine": scene.render.engine,
@@ -383,14 +474,20 @@ def main() -> int:
         "untagged_objects": untagged,
         "errors": errors,
         "warnings": warnings,
-        "result": "FAIL" if errors else "PASS",
-        "note": "AABB and screen-space crossing findings are conservative candidates and require full-frame plus detail-crop inspection.",
+        "result": result,
+        "scope": args.scope,
+        "unverified": unverified,
+        "coverage": {"components": len(visible_components), "registered_components": len(components), "audited_solids": len(solids), "skipped_solids": skipped_solids, "physical_routes": len(physical_connections), "finite_width_routes_checked": routes_checked, "visible_untagged": len(visible_untagged)},
+        "collision_findings": collision_findings,
+        "reflection_checks": reflections,
+        "scene_sha256": hashlib.sha256(scene_path.read_bytes()).hexdigest() if scene_path and scene_path.is_file() else None,
+        "note": "PASS covers declared checks only. Collision tests sample center/perimeter rays and containment, not exhaustive swept volumes. Projected bounds are review candidates. Source fidelity and visual acceptance require separate evidence.",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report, indent=2))
     print(f"report: {args.output}")
-    return 1 if errors else 0
+    return 1 if errors else 2 if unverified else 0
 
 
 if __name__ == "__main__":

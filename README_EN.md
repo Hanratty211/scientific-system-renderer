@@ -1,7 +1,7 @@
 # Scientific System Renderer
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
-[![Skill version](https://img.shields.io/badge/skill-v1.3.0-0b7285.svg)](manifest.yaml)
+[![Skill version](https://img.shields.io/badge/skill-v1.4.0-0b7285.svg)](manifest.yaml)
 [中文说明](README.md)
 
 An agent-operated skill for Codex, Claude Code, and other tool-using agents.
@@ -24,7 +24,20 @@ time states.
 - high-resolution transparent no-text masters plus editable SVG annotation;
 - auditing or repairing Blender scenes with interface and physical-layout risk.
 
-## Hard Gates in v1.3
+## New in v1.4
+
+Coverage-aware PASS / FAIL / UNVERIFIED results, sampled finite-width geometry
+checks including endpoint bodies, reflector checks, projected support review,
+artifact SHA256 binding, explicit no-text contracts, installation checks and
+executable Blender scene regressions. Sampling is not an exhaustive collision
+proof; visual self-review and user acceptance remain separate. See
+[Geometry validation](references/geometry-validation.md).
+
+Unsupported NURBS, modifiers, multiple splines, variable radii, mesh proxies
+and instances are not counted as completed route checks. The 19 original
+Blender regressions test tool behavior, not acceptance of paper-based figures.
+
+## Hard Gates
 
 1. **Component existence is independently evidenced.** A device appears only
    when user-confirmed, source-visible, authoritatively supported, or explicitly
