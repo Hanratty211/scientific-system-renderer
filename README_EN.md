@@ -1,7 +1,7 @@
 # Scientific System Renderer
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
-[![Skill version](https://img.shields.io/badge/skill-v1.4.1-0b7285.svg)](manifest.yaml)
+[![Skill version](https://img.shields.io/badge/skill-v1.5.0-0b7285.svg)](manifest.yaml)
 [中文说明](README.md)
 
 An agent-operated skill for Codex, Claude Code, and other tool-using agents.
@@ -23,6 +23,16 @@ time states.
   mechanism insets;
 - high-resolution transparent no-text masters plus editable SVG annotation;
 - auditing or repairing Blender scenes with interface and physical-layout risk.
+
+## Visual Identity in v1.5.0
+
+[Identity, scale and route clarity](references/identity-scale-and-route-clarity.md)
+preserves handheld, body-worn, stacked and mechanically coupled assemblies.
+It separates material classes, evidence-based instrument identity, true scale
+from magnified details, and physical connections from explanatory graphics.
+Topology checks cannot certify visual fidelity. Shared failures are repaired
+through representative samples with explicit per-case pending status; a skill
+update does not retroactively repair prior images.
 
 ## Scope Preservation in v1.4.1
 

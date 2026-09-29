@@ -51,6 +51,13 @@ output can be the endpoint. If a paper supports only a device view, replace the
 case or ask about the missing evidence; do not count it as a system validation.
 Component renders are assets or supplementary views, not substitutes.
 
+Preserve the source assembly as well as its functional graph. A handheld,
+body-worn, stacked, laminated or mechanically coupled system must not become a
+dispersed equipment layout unless the user asks for an exploded abstraction.
+Read [identity-scale-and-route-clarity.md](references/identity-scale-and-route-clarity.md)
+for photo-based work and perceptual repair. Lock silhouette, assembly,
+relative scale, material class and main subject before routing.
+
 ### 3. Read project governance and evidence
 
 Inspect repository instructions, task logs, output conventions, and Git status.
@@ -201,6 +208,14 @@ user acceptance.
 Check part-to-part fit and material character separately from route audits.
 Connection-free views can still contain intersecting packages, detached joints
 or a soft material rendered as rigid hardware; record these as visual findings.
+
+Compare the render beside the source at the intended viewing size. Recognizable
+assembly, scale hierarchy, material character and legible routes are independent
+acceptance gates; a topology or object-count pass cannot override their failure.
+When feedback identifies a shared visual failure across a batch, record every
+affected case and review representative repaired samples before repeating the
+generator across the batch. Mark unrebuilt cases explicitly; never imply that
+updating the skill retroactively repaired their renders.
 
 Before acceptance, run `scripts/validate_delivery_scope.py` with the original
 delivery contract and scene manifest. Match required nodes and relationships

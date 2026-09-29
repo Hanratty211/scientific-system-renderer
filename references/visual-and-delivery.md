@@ -15,15 +15,19 @@ Assign color by meaning, not decoration:
 
 | Meaning | Suggested treatment |
 |---|---|
-| physical hardware | neutral gray, black, brushed metal |
+| physical hardware | evidence-based part materials; do not turn polymer, PCB or tissue into metal |
 | transparent optics | pale cyan/gray glass |
 | optical or energy path | one saturated wavelength or restrained glow |
-| electrical/data path | warm orange or blue line family |
-| fluid/sample path | medium-specific color with arrows |
+| physical electrical/data cable | source-visible jacket color, or one neutral treatment for equivalent unknown jackets |
+| fluid/sample path | source-supported tube/material appearance; directions belong in an optional explained overlay |
 | active/sensor region | controlled accent distinct from the path |
-| uncertainty or schematic-only detail | muted gray or dashed outline |
+| uncertainty or schematic-only detail | explicit status in the review/legend; do not disguise an unknown physical cable as a dashed line |
 
 Do not use multiple translucent layers to represent one physical path unless each layer has a documented meaning.
+
+This table is not a preset requiring every color and symbol in one render.
+For real setups, preserve observed appearance and keep explanatory arrows out
+of the no-text master. See [identity-scale-and-route-clarity.md](identity-scale-and-route-clarity.md).
 
 ## Labels
 

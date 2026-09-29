@@ -1,7 +1,7 @@
 # Scientific System Renderer
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
-[![Skill version](https://img.shields.io/badge/skill-v1.4.1-0b7285.svg)](manifest.yaml)
+[![Skill version](https://img.shields.io/badge/skill-v1.5.0-0b7285.svg)](manifest.yaml)
 [English](README_EN.md)
 
 面向 Codex、Claude Code 等 Agent 的科研系统渲染 Skill。它把实物照片、
@@ -19,6 +19,14 @@
 - 高分辨率透明无文字底图与可编辑 SVG 标注；
 - 修复光路/线缆穿模、器件悬空、端口接错、比例失真和时序误画；
 - 对已有 Blender 工程做物理、接口、构图和交付审计。
+
+## v1.5.0 实物识别与视觉验收
+
+新增 [形态、尺度与连接可读性规则](references/identity-scale-and-route-clarity.md)：
+保留手持、佩戴、叠放与机械耦合关系；区分电路板、封装、接头和软材料的材质；
+按证据区分仪器外形；真实尺寸与局部放大分开表达；实体线与说明箭头分层。
+拓扑自动检查不再被当成形态、比例或画面可读性的验收依据。
+共性问题先做代表性返工样张，并逐项保留未返工状态，不能宣称更新 Skill 即修好所有图。
 
 ## v1.4.1 范围防降级
 

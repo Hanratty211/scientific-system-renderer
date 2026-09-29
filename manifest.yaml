@@ -1,5 +1,5 @@
 name: scientific-system-renderer
-version: 1.4.1
+version: 1.5.0
 description: >
   Router manifest for evidence-grounded scientific system rendering. Core
   physical and QA rules load for every task; route and domain references load
@@ -72,3 +72,5 @@ references:
       path: references/optical-bench-failure-patterns.md
     - condition: real devices, front panels, ports, jumpers, cables, tubes, fibers, supports, endpoints, or user hardware corrections are involved
       path: references/interface-and-route-qa.md
+    - condition: photo-based reconstruction, recognizable equipment, relative scale, confusing routes, or perceptual user feedback is involved
+      path: references/identity-scale-and-route-clarity.md
