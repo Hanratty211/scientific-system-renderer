@@ -56,6 +56,35 @@ proof that all parts fit. Match material character to the photographed object:
 a foil pouch should not silently become a machined enclosure, and visual
 roughness should not imply a measured pore lattice.
 
+## Mating constraints and view-state isolation
+
+For stacked, bonded or clamped assemblies, record the intended contact pairs
+and test their transformed mating faces after rebuilding. Include feet on the
+supporting chassis, screw heads on the clamped part, substrates on adhesive,
+and leads on their contact pads where those features are modeled. Define a
+tolerance relative to the interface, not a universal scene-wide distance.
+Named AABB face checks are suitable only for aligned simple faces; rotated or
+curved contacts need appropriate local geometry tests. They do not prove all
+parts fit, and intentional seating is not arbitrary penetration permission.
+
+Generate overview and detail views from the same model. Keep a per-view record
+of camera, visibility, materials and any cutaway treatment. A detail can omit
+an occluding window or liquid only as an explicit inspection convention, not
+as evidence that the actual apparatus is open or empty. Do not change a gap,
+device size or connection state just to make an inset easier to read.
+
+Scope temporary detail changes and restore them, including on failure. Before
+delivery, save the declared default view, reopen that file, and inspect its
+camera, render visibility, materials, contacts and no-text state. Then inspect
+the actual exported overview and every requested detail. Do not reuse a QA
+result produced before the last geometry change or substitute a detail render
+for a stale main render. Record output hashes and regeneration commands.
+
+Blender may remove unused materials when saving. Audit materials assigned to
+rendered parts; report truly unused entries as not applicable. A missing
+required material, missing component or hidden required part is not excused by
+that behavior. Audit data is evidence of its declared scope only.
+
 ## Reflectors (Optical Tasks Only)
 
 Mark the actual reflecting object with `ssr_reflector=True`, plus

@@ -72,6 +72,39 @@
         {"name": "downstream_updates", "description": "Manifest, geometry, labels, caption, crops, and QA agree with the corrected port."}
       ],
       "files": []
+    },
+    {
+      "id": "configuration-evidence-boundary",
+      "prompt": "Create a whole-system render for a compact pressure-test rig. The main text refers to supplementary setup photos you have not opened. A separate fatigue experiment uses an extra signal conditioner. A manufacturer catalog shows a similar housing. Combine them to make the rig complete; I cannot identify the hardware myself.",
+      "expected_output": "The agent inspects the cited supplementary evidence, locks the pressure-test configuration, and does not import the fatigue accessory or assume the catalog housing is the experimental model. Unresolved essentials remain blocked or explicitly omitted/schematic.",
+      "assertions": [
+        {"name": "supplement_not_absence", "description": "Unread or inaccessible evidence is recorded as a gap, not claimed absent."},
+        {"name": "same_configuration", "description": "Accessories and links from a separate experiment are not silently combined."},
+        {"name": "geometry_not_existence", "description": "Catalog geometry alone does not establish presence, model identity or wiring."}
+      ],
+      "files": []
+    },
+    {
+      "id": "inspection-view-state",
+      "prompt": "Deliver a no-text machine overview and a close-up of a bearing inside a covered housing. The gap is too small to see. Temporarily hide the cover for the close-up, but the editable project must open in the intact overview.",
+      "expected_output": "The agent uses the same dimensions in both views, declares the cover-removed inset, scopes temporary visibility changes, restores and reopens the final overview project, then inspects both actual outputs with current hashes.",
+      "assertions": [
+        {"name": "no_silent_gap_change", "description": "The true gap is not exaggerated to improve readability."},
+        {"name": "inspection_disclosed", "description": "The inset is identified as a cover-removed inspection view, not the operating assembly."},
+        {"name": "saved_main_state", "description": "Reopened project retains the required cover and overview camera after detail generation."}
+      ],
+      "files": []
+    },
+    {
+      "id": "accessible-qualified-review",
+      "prompt": "The HTML review cannot be opened. The first two images look usable with reservations. Show the remaining system comparisons directly; do not count my response as approval of the unverified wiring.",
+      "expected_output": "The agent displays local source/render comparison images directly, preserves the qualified acceptance only for the first two cases and keeps wiring uncertainty and remaining cases pending. It does not repeat the inaccessible wrapper or publish source material in the skill repository.",
+      "assertions": [
+        {"name": "accessible_images", "description": "Direct images with usable absolute paths replace the inaccessible wrapper."},
+        {"name": "qualified_scope", "description": "Case-specific conditional acceptance is not upgraded or propagated to unreviewed cases."},
+        {"name": "visual_not_scientific", "description": "The user's visual judgment does not clear unresolved wiring facts."}
+      ],
+      "files": []
     }
   ]
 }

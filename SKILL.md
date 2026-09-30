@@ -67,6 +67,10 @@ transparency, exact scale, or internal behavior from visual resemblance alone.
 Extract caption/method parameters before choosing repeated unit counts, gaps or
 active-area dimensions. Distinguish structural geometry from illustrative
 surface texture; keep source values separate from visual estimates.
+For paper-based setups, inspect cited supplementary apparatus views before
+declaring setup evidence absent. Lock one specimen, configuration and operating
+state; a manufacturer's drawing can establish geometry without establishing
+that device's presence or wiring in the selected experiment.
 
 Read [evidence-and-provenance.md](references/evidence-and-provenance.md) when
 copyright, product fidelity, citations, or source tracing matters.
@@ -180,6 +184,11 @@ Represent each physical port as an interface anchor tagged with
 endpoints coincide with the anchors.
 
 ### 8. Audit, render, and inspect
+
+For overview/detail exports, read the view-state and saved-scene checks in
+[geometry-validation.md](references/geometry-validation.md). Restore the main
+camera and visibility after detail-only changes, reopen the delivered scene,
+and bind QA to the final files rather than an earlier preview.
 
 Audit a saved scene:
 

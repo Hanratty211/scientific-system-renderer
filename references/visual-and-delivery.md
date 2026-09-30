@@ -99,3 +99,20 @@ render-package/
 ```
 
 Keep only approved deliverables in `final/`. Put rejected renders, screenshots, temporary textures, and experiments in `intermediate/`. Preserve provenance without making the delivery folder difficult to find.
+
+## Source comparisons and review access
+
+For photo-based revision, offer the exact source panel beside the complete
+revised system, with the requested detail views as additions. State what the
+photo covers and which peripherals remain schematic. Independently fitted
+source/render windows are not a shared physical scale; disclose that difference.
+Identify every magnified, cutaway or occlusion-removed inset without adding
+unrequested labels to the no-text master. Keep provenance for source panels,
+manufacturer supplements, masters and details rather than only the overview.
+
+Use a shallow review folder with stable case IDs. When the user cannot view an
+HTML or PDF wrapper, display ordinary local comparison images directly in the
+conversation using absolute paths. Do not send the same inaccessible wrapper
+again or bypass tool restrictions. Source comparisons belong to the private
+project unless their redistribution rights are separately established; they
+are not assets to bundle with the public skill.

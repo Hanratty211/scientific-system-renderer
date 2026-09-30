@@ -1,7 +1,7 @@
 # Scientific System Renderer
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
-[![Skill version](https://img.shields.io/badge/skill-v1.5.0-0b7285.svg)](manifest.yaml)
+[![Skill version](https://img.shields.io/badge/skill-v1.6.0-0b7285.svg)](manifest.yaml)
 [English](README_EN.md)
 
 面向 Codex、Claude Code 等 Agent 的科研系统渲染 Skill。它把实物照片、
@@ -19,6 +19,19 @@
 - 高分辨率透明无文字底图与可编辑 SVG 标注；
 - 修复光路/线缆穿模、器件悬空、端口接错、比例失真和时序误画；
 - 对已有 Blender 工程做物理、接口、构图和交付审计。
+
+## v1.6.0 证据工况与交付复查
+
+- 主文引用了补充装置图时先查阅，不能把“尚未读取”说成“没有实物图”。
+- 锁定同一个样品、工况和实验配置；厂家尺寸不能证明该设备或接线在实验中存在。
+- 总览与局部共用模型；不放大实际间隙，去除窗口/液体等观察处理须明确说明。
+- 补查叠放脚垫、螺钉、粘接层和导线接触；恢复主视图后重新打开最终工程核对。
+- 实物对照可直接以图片交付；有保留的“可用”不等于隐藏拓扑或科学事实已验收。
+
+细则见 [证据](references/evidence-and-provenance.md)、
+[保存工程与多视图检查](references/geometry-validation.md) 和
+[对照交付](references/visual-and-delivery.md)。本次增加的是 Agent 工作流规则和
+原创行为评测题，不是新增的全场景自动碰撞证明。论文、厂家资料和案例图不随 Skill 发布。
 
 ## v1.5.0 实物识别与视觉验收
 

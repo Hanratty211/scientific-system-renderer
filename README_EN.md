@@ -1,7 +1,7 @@
 # Scientific System Renderer
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
-[![Skill version](https://img.shields.io/badge/skill-v1.5.0-0b7285.svg)](manifest.yaml)
+[![Skill version](https://img.shields.io/badge/skill-v1.6.0-0b7285.svg)](manifest.yaml)
 [中文说明](README.md)
 
 An agent-operated skill for Codex, Claude Code, and other tool-using agents.
@@ -23,6 +23,21 @@ time states.
   mechanism insets;
 - high-resolution transparent no-text masters plus editable SVG annotation;
 - auditing or repairing Blender scenes with interface and physical-layout risk.
+
+## Configuration Evidence and Delivery Review in v1.6.0
+
+- Read cited supplementary setup views before claiming apparatus evidence is absent.
+- Lock one specimen and operating configuration; manufacturer geometry does not prove experimental presence or wiring.
+- Keep overview/detail geometry consistent and disclose removed windows, liquid or other inspection-only treatments.
+- Check selected mating interfaces, restore the main view, and reopen the delivered scene after the last change.
+- Deliver accessible source/render images and keep conditional user approval separate from scientific validation.
+
+See [evidence](references/evidence-and-provenance.md),
+[saved-scene and view-state checks](references/geometry-validation.md), and
+[comparison delivery](references/visual-and-delivery.md). These additions are
+agent workflow rules and original behavioral evaluation prompts, not a new
+exhaustive collision checker. Papers, manufacturer materials and case renders
+are not distributed with the skill.
 
 ## Visual Identity in v1.5.0
 

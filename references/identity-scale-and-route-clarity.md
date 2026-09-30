@@ -107,3 +107,8 @@ Before delivery ask separately:
    where necessary?
 
 Document actual findings. User acceptance stays pending until the user accepts.
+Record qualified feedback such as "usable with reservations" separately from
+unconditional approval. Preserve the user's wording and its batch/case scope;
+do not promote a visual preference into scientific, wiring or manufacturing
+validation. A favorable judgment of an overview does not resolve its recorded
+unknown ports, hidden channels or omitted branches.

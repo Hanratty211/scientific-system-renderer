@@ -55,6 +55,25 @@ identity. A wide setup photograph can prove that a chassis is present while a
 front-panel close-up proves connector order. Neither one automatically proves
 the hidden rear-panel topology.
 
+## Lock one experimental configuration
+
+Record the selected specimen, experiment, operating state and source panel in
+the project ledger. Inspect supplementary setup photographs and methods when
+the main article points to them. An unread or inaccessible supplement is an
+evidence gap, not proof that no apparatus photograph exists.
+
+Do not merge characterization fixtures, enlarged prototypes, calibration
+accessories or later operating modes into a single setup. Trace any borrowed
+component or connection to the selected configuration. A manufacturer's drawing
+can resolve an exact model's dimensions; it cannot prove that the model or a
+particular adapter was used in this experiment. Treat front-panel appearance,
+functional channel groups and exact pin assignments as separate claims.
+
+Keep physical dimensions distinct from display dimensions. Use an overview at
+one declared scale and separate magnified views for small critical features.
+For incomplete evidence, state which geometry is schematic and keep unresolved
+connections unresolved; a tidy functional harness is not a verified wiring map.
+
 ## Use of reference images
 
 - Learn visual grammar, camera angle, material treatment, and label density without copying artwork.

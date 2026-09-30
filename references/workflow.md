@@ -142,7 +142,9 @@ For every visual round:
 2. Generate white, dark, and checkerboard composites when alpha is present.
 3. Inspect the whole image and crops around every path junction and dense component cluster.
 4. Inspect every declared port group, each connection endpoint, each support contact, and the complete path corridor at native resolution.
-5. Record `accepted` or `rejected`; never use vague status such as “looks better”.
+5. Record the agent's scoped result (`pass`, `fail` or `unverified`) separately
+   from user status (`pending`, `rejected`, `conditionally-usable` or `accepted`).
+   Preserve any qualified user wording; “looks better” alone is not a full pass.
 6. List observable defects, not intentions.
 7. Map each defect to a script or scene change.
 8. Re-render from the reproducible source.
